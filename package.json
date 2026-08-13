@@ -1,6 +1,6 @@
 {
 	"name": "pi-auch",
-	"version": "0.1.4",
+	"version": "0.1.5-rc0",
 	"description": "Compact quota status for Codex, GitHub Copilot, and OpenCode Go in Pi's footer",
 	"type": "module",
 	"license": "MIT",
