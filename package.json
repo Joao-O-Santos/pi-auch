@@ -1,0 +1,39 @@
+{
+	"name": "pi-auch",
+	"version": "0.1.0",
+	"description": "Compact quota status for Codex, GitHub Copilot, and OpenCode Go in Pi's footer",
+	"type": "module",
+	"license": "MIT",
+	"keywords": [
+		"pi-package",
+		"pi",
+		"quota",
+		"usage"
+	],
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"test": "node --import tsx --test test/*.test.ts",
+		"coverage": "node --import tsx --test --experimental-test-coverage --test-coverage-include=src/**/*.ts --test-coverage-lines=100 --test-coverage-functions=100 test/*.test.ts",
+		"typecheck": "tsc --noEmit",
+		"lint": "biome check .",
+		"check": "npm run typecheck && npm run lint && npm run coverage"
+	},
+	"pi": {
+		"extensions": [
+			"./src/index.ts"
+		]
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": ">=0.84.1"
+	},
+	"devDependencies": {
+		"@earendil-works/pi-coding-agent": "^0.84.1",
+		"@types/node": "^26.2.0",
+		"tsx": "^4.23.12",
+		"typescript": "^7.0.2"
+	}
+}
