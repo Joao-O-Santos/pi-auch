@@ -7,6 +7,7 @@ check:
   stage: test
   script:
     - npm ci
+    - npm install --no-save @biomejs/biome@2.5.7
     - npm run check
     - npm pack --dry-run
     - npm audit --omit=dev
