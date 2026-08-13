@@ -2,6 +2,7 @@ image: node:latest
 
 stages:
   - test
+  - publish
 
 check:
   stage: test
@@ -11,3 +12,15 @@ check:
     - npm run check
     - npm pack --dry-run
     - npm audit --omit=dev
+
+publish:
+  stage: publish
+  needs:
+    - check
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - test -n "$NPM_TOKEN"
+    - test "${CI_COMMIT_TAG#v}" = "$(node -p "require('./package.json').version")"
+    - npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN" --location=user
+    - npm publish --access public
