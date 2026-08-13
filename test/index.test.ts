@@ -3,7 +3,10 @@ import test from "node:test";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import piAuch from "../src/index.js";
 
-type Handler = (event: never, context: ExtensionContext) => Promise<void>;
+type Handler = (
+	event: { status: number; headers: Record<string, string> },
+	context: ExtensionContext,
+) => void | Promise<void>;
 type CommandHandler = (args: string, context: ExtensionContext) => Promise<void>;
 
 interface Notice {
@@ -53,38 +56,44 @@ test("extension follows the complete session, model, command, and shutdown lifec
 		globalThis.setInterval = originalSetInterval;
 	});
 	piAuch(pi);
-	assert.deepEqual([...handlers.keys()], ["session_start", "session_shutdown"]);
+	assert.deepEqual(
+		[...handlers.keys()],
+		["session_start", "session_shutdown", "after_provider_response"],
+	);
 	assert.ok(command);
 
 	await command("", context);
 	assert.equal(notices.at(-1)?.level, "warning");
 	const shutdown = handlers.get("session_shutdown");
 	assert.ok(shutdown);
-	await shutdown({} as never, context);
+	await shutdown({ status: 0, headers: {} }, context);
 
-	const originalFetch = globalThis.fetch;
-	globalThis.fetch = async () =>
-		new Response(
-			JSON.stringify({
-				quota_snapshots: {
-					chat: { unlimited: true },
-				},
-			}),
-			{ headers: { "content-type": "application/json" } },
-		);
-	t.after(() => {
-		globalThis.fetch = originalFetch;
-	});
-	await handlers.get("session_start")?.({} as never, context);
-	await handlers.get("session_start")?.({} as never, context);
+	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
+	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
 	intervalCallback?.();
 	await new Promise((resolve) => setImmediate(resolve));
-	assert.match(statuses.at(-1) ?? "", /Copilot chat ∞/);
+	assert.match(statuses.at(-1) ?? "", /Copilot configured/);
+
+	context.model = { provider: "github-copilot" } as typeof context.model;
+	await handlers.get("after_provider_response")?.(
+		{ status: 200, headers: { "x-copilot-premium-requests-used-percent": "25" } },
+		context,
+	);
+	assert.match(statuses.at(-1) ?? "", /Copilot premium requests 25%/);
+	await handlers.get("after_provider_response")?.({ status: 200, headers: {} }, context);
+	assert.match(statuses.at(-1) ?? "", /Copilot premium requests 25%/);
+	context.model = { provider: "opencode-go" } as typeof context.model;
+	await handlers.get("after_provider_response")?.({ status: 200, headers: {} }, context);
+	assert.match(statuses.at(-1) ?? "", /Copilot premium requests 25%/);
+	context.model = { provider: "github-copilot" } as typeof context.model;
+	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
+	context.model = { provider: "openai-codex" } as typeof context.model;
+	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
 
 	await command("", context);
 	assert.equal(notices.at(-1)?.level, "info");
 	assert.match(notices.at(-1)?.message ?? "", /Codex: unavailable/);
 
-	await shutdown({} as never, context);
+	await shutdown({ status: 0, headers: {} }, context);
 	assert.equal(statuses.at(-1), undefined);
 });

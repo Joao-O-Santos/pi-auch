@@ -60,20 +60,71 @@ test("Codex reader rejects absent and malformed credentials", async () => {
 	}
 });
 
-test("Copilot reader uses only Pi-resolved auth", async () => {
-	await withFetch(
-		new Response('{"quota_snapshots":{"chat":{"unlimited":true}}}', {
-			headers: { "content-type": "application/json" },
-		}),
-		async (calls) => {
-			const copilot = reader({ "github-copilot": { apiKey: "resolved" } }, 1);
-			assert.equal((await copilot.read(new AbortController().signal)).provider, "github-copilot");
-			assert.equal(new Headers(calls[0]?.init?.headers).get("authorization"), "Bearer resolved");
-		},
+test("Copilot reader reports configuration and preserves passive usage without a probe", async () => {
+	const configured = reader({ "github-copilot": { apiKey: "resolved" } }, 1);
+	assert.equal(
+		(await configured.read(new AbortController().signal)).metrics[0]?.label,
+		"configured",
 	);
+
+	const passive = {
+		provider: "github-copilot" as const,
+		fetchedAt: 1,
+		metrics: [{ label: "requests", usedPercent: 20 }],
+	};
+	const copilot = createReaders(
+		async (provider) => (provider === "github-copilot" ? { apiKey: "resolved" } : undefined),
+		(provider) => (provider === "github-copilot" ? passive : undefined),
+	)[1];
+	assert.ok(copilot);
+	assert.strictEqual(await copilot.read(new AbortController().signal), passive);
+	await assert.rejects(reader({}, 1).read(new AbortController().signal), /not configured/);
 });
 
-test("OpenCode reader uses only Pi-resolved auth", async () => {
+test("OpenCode reader reports configuration, passive usage, and configuration errors", async (t) => {
+	const oldConfig = process.env.OPENCODE_GO_QUOTA_CONFIG;
+	const oldWorkspace = process.env.OPENCODE_GO_WORKSPACE_ID;
+	const oldCookie = process.env.OPENCODE_GO_AUTH_COOKIE;
+	process.env.OPENCODE_GO_QUOTA_CONFIG = "/definitely/missing/pi-auch.json";
+	delete process.env.OPENCODE_GO_WORKSPACE_ID;
+	delete process.env.OPENCODE_GO_AUTH_COOKIE;
+	t.after(() => {
+		if (oldConfig === undefined) delete process.env.OPENCODE_GO_QUOTA_CONFIG;
+		else process.env.OPENCODE_GO_QUOTA_CONFIG = oldConfig;
+		if (oldWorkspace === undefined) delete process.env.OPENCODE_GO_WORKSPACE_ID;
+		else process.env.OPENCODE_GO_WORKSPACE_ID = oldWorkspace;
+		if (oldCookie === undefined) delete process.env.OPENCODE_GO_AUTH_COOKIE;
+		else process.env.OPENCODE_GO_AUTH_COOKIE = oldCookie;
+	});
+	const openCode = reader({ "opencode-go": { apiKey: "resolved" } }, 2);
+	assert.equal((await openCode.read(new AbortController().signal)).metrics[0]?.label, "configured");
+	const passive = {
+		provider: "opencode-go" as const,
+		fetchedAt: 1,
+		metrics: [{ label: "available" }],
+	};
+	const passiveReader = createReaders(
+		async (provider) => (provider === "opencode-go" ? { apiKey: "resolved" } : undefined),
+		(provider) => (provider === "opencode-go" ? passive : undefined),
+	)[2];
+	assert.ok(passiveReader);
+	assert.strictEqual(await passiveReader.read(new AbortController().signal), passive);
+	process.env.OPENCODE_GO_WORKSPACE_ID = "only-one";
+	await assert.rejects(openCode.read(new AbortController().signal), /needs/);
+	await assert.rejects(reader({}, 2).read(new AbortController().signal), /not configured/);
+});
+
+test("OpenCode reader uses explicitly configured dashboard cookie", async (t) => {
+	const oldWorkspace = process.env.OPENCODE_GO_WORKSPACE_ID;
+	const oldCookie = process.env.OPENCODE_GO_AUTH_COOKIE;
+	process.env.OPENCODE_GO_WORKSPACE_ID = "space/id";
+	process.env.OPENCODE_GO_AUTH_COOKIE = "browser-cookie";
+	t.after(() => {
+		if (oldWorkspace === undefined) delete process.env.OPENCODE_GO_WORKSPACE_ID;
+		else process.env.OPENCODE_GO_WORKSPACE_ID = oldWorkspace;
+		if (oldCookie === undefined) delete process.env.OPENCODE_GO_AUTH_COOKIE;
+		else process.env.OPENCODE_GO_AUTH_COOKIE = oldCookie;
+	});
 	await withFetch(
 		new Response("<h2>Rolling</h2><b>8%</b>", {
 			headers: { "content-type": "text/html" },
@@ -81,8 +132,9 @@ test("OpenCode reader uses only Pi-resolved auth", async () => {
 		async (calls) => {
 			const openCode = reader({ "opencode-go": { apiKey: "resolved" } }, 2);
 			assert.equal((await openCode.read(new AbortController().signal)).provider, "opencode-go");
-			assert.equal(calls[0]?.url, "https://opencode.ai/workspace");
-			assert.equal(new Headers(calls[0]?.init?.headers).get("authorization"), "Bearer resolved");
+			assert.equal(calls[0]?.url, "https://opencode.ai/workspace/space%2Fid/go");
+			assert.equal(new Headers(calls[0]?.init?.headers).get("cookie"), "auth=browser-cookie");
+			assert.equal(new Headers(calls[0]?.init?.headers).get("authorization"), null);
 		},
 	);
 });

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseCodexUsage, parseCopilotUsage, parseOpenCodeUsage } from "../src/parse.js";
+import { parseCodexUsage, parseOpenCodeUsage } from "../src/parse.js";
 
 test("parses Codex rolling and weekly windows", () => {
 	const value = parseCodexUsage({
@@ -34,29 +34,6 @@ test("rejects malformed Codex usage", () => {
 	);
 });
 
-test("parses Copilot metered and unlimited quotas", () => {
-	const value = parseCopilotUsage({
-		copilot_plan: "individual",
-		quota_reset_date: "2030-01-01T00:00:00Z",
-		quota_snapshots: {
-			premium_interactions: {
-				entitlement: 300,
-				quota_remaining: 240,
-				percent_remaining: 80,
-			},
-			chat: { unlimited: true },
-		},
-	});
-	assert.deepEqual(value.metrics[0], {
-		label: "premium interactions",
-		limit: 300,
-		remaining: 240,
-		usedPercent: 20,
-		resetAt: Date.parse("2030-01-01T00:00:00Z"),
-	});
-	assert.equal(value.metrics[1]?.unlimited, true);
-});
-
 test("parses labeled OpenCode dashboard cards and ignores scripts", () => {
 	const value = parseOpenCodeUsage(`
 		<script>weekly 99%</script>
@@ -74,32 +51,18 @@ test("parses labeled OpenCode dashboard cards and ignores scripts", () => {
 	);
 });
 
-test("accepts Copilot remaining aliases, invalid reset dates, and skips malformed snapshots", () => {
-	const value = parseCopilotUsage({
-		quota_reset_date: "not-a-date",
-		quota_snapshots: {
-			bad: null,
-			empty: {},
-			negative: { entitlement: -1, remaining: -2 },
-			remaining: { remaining: 3 },
-		},
-	});
-	assert.deepEqual(
-		value.metrics.map(({ label, remaining }) => ({ label, remaining })),
-		[
-			{ label: "negative", remaining: undefined },
-			{ label: "remaining", remaining: 3 },
-		],
+test("parses OpenCode dashboard embedded quota data", () => {
+	const before = Date.now();
+	const value = parseOpenCodeUsage(
+		"rollingUsage:$R[1]={usagePercent:9.5,resetInSec:60} weeklyUsage:$R[2]={usagePercent:20}",
 	);
-});
-
-test("rejects malformed Copilot usage", () => {
-	for (const input of [null, [], {}, { quota_snapshots: [] }]) {
-		assert.throws(() => parseCopilotUsage(input), /invalid Copilot/);
-	}
-	assert.throws(() => parseCopilotUsage({ quota_snapshots: {} }), /no recognized/);
+	assert.equal(value.metrics[0]?.usedPercent, 9.5);
+	assert.ok((value.metrics[0]?.resetAt ?? 0) >= before + 60_000);
+	assert.equal(value.metrics[1]?.usedPercent, 20);
 });
 
 test("rejects an OpenCode login page or changed shape", () => {
-	assert.throws(() => parseOpenCodeUsage("<html>Please sign in</html>"), /no recognized/);
+	for (const html of ["<html>Please sign in</html>", "rollingUsage:$R[1]={usagePercent:101}"]) {
+		assert.throws(() => parseOpenCodeUsage(html), /no recognized/);
+	}
 });

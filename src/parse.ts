@@ -62,39 +62,6 @@ export function parseCodexUsage(value: unknown): QuotaResult {
 	return result("openai-codex", metrics, root.plan_type);
 }
 
-export function parseCopilotUsage(value: unknown): QuotaResult {
-	const root = record(value);
-	const snapshots = record(root?.quota_snapshots);
-	if (!root || !snapshots) throw new Error("invalid Copilot usage response");
-
-	const resetAt = timestamp(root.quota_reset_date);
-	const metrics: QuotaMetric[] = [];
-	for (const [key, raw] of Object.entries(snapshots)) {
-		const snapshot = record(raw);
-		if (!snapshot) continue;
-		const unlimited = snapshot.unlimited === true;
-		const limit = finite(snapshot.entitlement);
-		const remaining = finite(snapshot.remaining) ?? finite(snapshot.quota_remaining);
-		const remainingPercent = percent(snapshot.percent_remaining);
-		if (
-			!unlimited &&
-			limit === undefined &&
-			remaining === undefined &&
-			remainingPercent === undefined
-		)
-			continue;
-		metrics.push({
-			label: key.replaceAll("_", " "),
-			...(unlimited ? { unlimited: true } : {}),
-			...(limit !== undefined && limit >= 0 ? { limit } : {}),
-			...(remaining !== undefined && remaining >= 0 ? { remaining } : {}),
-			...(remainingPercent !== undefined ? { usedPercent: 100 - remainingPercent } : {}),
-			...(resetAt !== undefined ? { resetAt } : {}),
-		});
-	}
-	return result("github-copilot", metrics, root.copilot_plan);
-}
-
 function decodeEntities(text: string): string {
 	return text
 		.replaceAll(/&nbsp;|&#160;/gi, " ")
@@ -104,6 +71,21 @@ function decodeEntities(text: string): string {
 }
 
 export function parseOpenCodeUsage(html: string): QuotaResult {
+	const metrics: QuotaMetric[] = [];
+	for (const label of ["rolling", "weekly", "monthly"] as const) {
+		const embedded = new RegExp(`${label}Usage:\\$R\\[\\d+\\]=\\{([^}]*)\\}`).exec(html)?.[1];
+		const usage = embedded ? /usagePercent:(\d+(?:\.\d+)?)/.exec(embedded)?.[1] : undefined;
+		if (!usage) continue;
+		const usedPercent = Number(usage);
+		if (usedPercent < 0 || usedPercent > 100) continue;
+		const reset = /resetInSec:(\d+(?:\.\d+)?)/.exec(embedded ?? "")?.[1];
+		metrics.push({
+			label,
+			usedPercent,
+			...(reset ? { resetAt: Date.now() + Number(reset) * 1000 } : {}),
+		});
+	}
+
 	const text = decodeEntities(
 		html
 			.replaceAll(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
@@ -111,8 +93,8 @@ export function parseOpenCodeUsage(html: string): QuotaResult {
 			.replaceAll(/<[^>]+>/g, " "),
 	).replaceAll(/\s+/g, " ");
 
-	const metrics: QuotaMetric[] = [];
 	for (const label of ["rolling", "weekly", "monthly"] as const) {
+		if (metrics.some((metric) => metric.label === label)) continue;
 		const match = text.match(
 			new RegExp(`\\b${label}\\b[^%]{0,100}?((?:100|\\d{1,2})(?:\\.\\d+)?)\\s*%`, "i"),
 		);

@@ -14,8 +14,8 @@
 
 - {accepted} Use real quota sources rather than spending quota on model probes:
   - Codex: ChatGPT `wham/usage`.
-  - GitHub Copilot: `copilot_internal/user`.
-  - OpenCode Go: authenticated workspace dashboard usage.
+  - GitHub Copilot: passive quota/rate-limit headers from normal session use.
+  - OpenCode Go: authenticated workspace dashboard usage, with passive headers when available.
 - {accepted} Show compact usage for every configured provider in Pi's standard footer via `ctx.ui.setStatus()`.
 - {provisional} Keep `/auch` as a secondary command for explicit refresh and provider details.
 
@@ -29,14 +29,14 @@
 
 - {accepted} Do not expose or log credentials.
 - {accepted} Resolve Pi state with `getAgentDir()` / `PI_CODING_AGENT_DIR`; do not hardcode `~/.pi/agent`.
-- {accepted} Do not use model probes when a quota endpoint exists.
+- {accepted} Do not use model probes.
 - {accepted} Leave the adjacent `pi-sych` repository unchanged.
 - {inferred} Bound network requests and response sizes, retain stale successful data on transient failures, and avoid overlapping refreshes.
-- {inferred} Treat the OpenCode Go browser cookie file as sensitive and require private permissions on POSIX systems.
+- {accepted} Permit an explicitly configured OpenCode Go browser cookie through environment variables or a private config file; require private file permissions on POSIX systems.
 
 ## Completion criteria
 
-- The footer populates on session start with usage for all configured providers.
+- The footer populates on session start for all configured providers; Copilot quota appears after normal Copilot use exposes response headers.
 - Quota data refreshes at a conservative interval and all session resources are cleaned up on shutdown.
 - `/auch` refreshes and reports all configured providers without revealing secrets.
 - Provider failures are isolated; stale successful data remains identifiable and usable.

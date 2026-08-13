@@ -11,10 +11,12 @@ function sample(): QuotaResult {
 	};
 }
 
-test("reads empty state and rejects unsupported providers", async () => {
+test("reads, stores, and rejects unsupported providers", async () => {
 	const cache = new QuotaCache([]);
 	assert.equal(cache.get("openai-codex"), undefined);
-	assert.deepEqual(await cache.refresh("openai-codex"), {
+	cache.store(sample());
+	assert.equal(cache.get("openai-codex")?.status, "ready");
+	assert.deepEqual(await cache.refresh("github-copilot"), {
 		status: "unavailable",
 		error: "unsupported provider",
 	});

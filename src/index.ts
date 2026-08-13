@@ -1,15 +1,22 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { QuotaCache } from "./cache.js";
+import { parseCopilotHeaders, parseOpenCodeGoHeaders } from "./passive.js";
 import { createReaders, type ProviderAuth } from "./readers.js";
 import { formatConfiguredFooter, formatDetail } from "./render.js";
-import { PROVIDERS } from "./types.js";
+import { PROVIDERS, type ProviderId, type QuotaResult } from "./types.js";
 
 const STATUS_KEY = "pi-auch";
 const REFRESH_MS = 15 * 60 * 1000;
 
 export default function piAuch(pi: ExtensionAPI) {
 	let resolveAuth: (provider: string) => Promise<ProviderAuth | undefined> = async () => undefined;
-	const cache = new QuotaCache(createReaders((provider) => resolveAuth(provider)));
+	const passive = new Map<ProviderId, QuotaResult>();
+	const cache = new QuotaCache(
+		createReaders(
+			(provider) => resolveAuth(provider),
+			(provider) => passive.get(provider),
+		),
+	);
 	let timer: ReturnType<typeof setInterval> | undefined;
 	let running = false;
 
@@ -46,6 +53,19 @@ export default function piAuch(pi: ExtensionAPI) {
 		ctx.ui.setStatus(STATUS_KEY, undefined);
 	};
 	pi.on("session_shutdown", (_event, ctx) => shutdown(ctx));
+	pi.on("after_provider_response", (event, ctx) => {
+		const provider = ctx.model?.provider;
+		const value =
+			provider === "github-copilot"
+				? parseCopilotHeaders(event.headers, event.status)
+				: provider === "opencode-go"
+					? parseOpenCodeGoHeaders(event.headers, event.status)
+					: undefined;
+		if (!value) return;
+		passive.set(value.provider, value);
+		cache.store(value);
+		if (running) render(ctx);
+	});
 	pi.registerCommand("auch", {
 		description: "Refresh and show quota details for configured providers",
 		handler: async (_args, ctx) => {

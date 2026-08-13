@@ -1,6 +1,7 @@
+import { getOpenCodeGoConfig } from "./config.js";
 import { boundedFetch } from "./http.js";
-import { parseCodexUsage, parseCopilotUsage, parseOpenCodeUsage } from "./parse.js";
-import type { ProviderReader } from "./types.js";
+import { parseCodexUsage, parseOpenCodeUsage } from "./parse.js";
+import type { ProviderId, ProviderReader, QuotaResult } from "./types.js";
 
 const USER_AGENT = "pi-auch/0.1";
 const OPENCODE_USAGE_URL = "https://opencode.ai/workspace";
@@ -11,6 +12,7 @@ export interface ProviderAuth {
 }
 
 export type ResolveProviderAuth = (provider: string) => Promise<ProviderAuth | undefined>;
+export type ReadPassiveUsage = (provider: ProviderId) => QuotaResult | undefined;
 
 function accountIdFromJwt(token: string): string | undefined {
 	try {
@@ -34,7 +36,14 @@ function token(auth: ProviderAuth | undefined, provider: string): string {
 	return auth.apiKey;
 }
 
-export function createReaders(resolveAuth: ResolveProviderAuth): ProviderReader[] {
+function configured(provider: ProviderId): QuotaResult {
+	return { provider, fetchedAt: Date.now(), metrics: [{ label: "configured" }] };
+}
+
+export function createReaders(
+	resolveAuth: ResolveProviderAuth,
+	readPassive: ReadPassiveUsage = () => undefined,
+): ProviderReader[] {
 	return [
 		{
 			id: "openai-codex",
@@ -57,34 +66,31 @@ export function createReaders(resolveAuth: ResolveProviderAuth): ProviderReader[
 		},
 		{
 			id: "github-copilot",
-			async read(signal) {
-				const apiKey = token(await resolveAuth("github-copilot"), "Copilot");
-				const value = await boundedFetch("https://api.github.com/copilot_internal/user", {
-					expectedType: "json",
-					signal,
-					headers: {
-						Accept: "application/json",
-						Authorization: `Bearer ${apiKey}`,
-						"User-Agent": USER_AGENT,
-					},
-				});
-				return parseCopilotUsage(value);
+			async read() {
+				token(await resolveAuth("github-copilot"), "Copilot");
+				return readPassive("github-copilot") ?? configured("github-copilot");
 			},
 		},
 		{
 			id: "opencode-go",
 			async read(signal) {
-				const apiKey = token(await resolveAuth("opencode-go"), "OpenCode Go");
-				const html = await boundedFetch(OPENCODE_USAGE_URL, {
-					expectedType: "html",
-					allowSameOriginRedirects: true,
-					signal,
-					headers: {
-						Accept: "text/html",
-						Authorization: `Bearer ${apiKey}`,
-						"User-Agent": USER_AGENT,
+				token(await resolveAuth("opencode-go"), "OpenCode Go");
+				const state = getOpenCodeGoConfig();
+				if ("error" in state) throw new Error(state.error);
+				if (!("config" in state)) return readPassive("opencode-go") ?? configured("opencode-go");
+				const html = await boundedFetch(
+					`${OPENCODE_USAGE_URL}/${encodeURIComponent(state.config.workspaceId)}/go`,
+					{
+						expectedType: "html",
+						allowSameOriginRedirects: true,
+						signal,
+						headers: {
+							Accept: "text/html",
+							Cookie: `auth=${state.config.authCookie}`,
+							"User-Agent": USER_AGENT,
+						},
 					},
-				});
+				);
 				return parseOpenCodeUsage(html as string);
 			},
 		},

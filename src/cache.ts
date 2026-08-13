@@ -14,6 +14,10 @@ export class QuotaCache {
 		return this.states.get(provider);
 	}
 
+	store(value: import("./types.js").QuotaResult): void {
+		this.states.set(value.provider, { status: "ready", value, stale: false });
+	}
+
 	refresh(provider: ProviderId): Promise<QuotaState> {
 		const existing = this.pending.get(provider);
 		if (existing) return existing;
