@@ -4,6 +4,12 @@
 	"description": "Compact quota status for Codex, GitHub Copilot, and OpenCode Go in Pi's footer",
 	"type": "module",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://gitlab.com/Joao-O-Santos/pi-auch.git"
+	},
+	"homepage": "https://gitlab.com/Joao-O-Santos/pi-auch",
+	"bugs": "https://gitlab.com/Joao-O-Santos/pi-auch/-/issues",
 	"keywords": [
 		"pi-package",
 		"pi",
