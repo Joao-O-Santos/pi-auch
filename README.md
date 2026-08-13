@@ -14,9 +14,13 @@ Compact quota visibility for Pi's standard footer. It supports OpenAI Codex, Git
 ## Install
 
 ```bash
-pi install /absolute/path/to/pi-auch
-# or try it once
-pi -e /absolute/path/to/pi-auch
+pi install npm:pi-auch
+```
+
+To try it for one session without installing it:
+
+```bash
+pi -e npm:pi-auch
 ```
 
 The active model's provider is shown in Pi's existing footer. Run `/auch` to refresh and display all provider details.
