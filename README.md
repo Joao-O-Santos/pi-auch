@@ -1,5 +1,14 @@
 # pi-auch
 
+[![pipeline
+status](https://gitlab.com/Joao-O-Santos/pi-auch/badges/main/pipeline.svg)](https://gitlab.com/Joao-O-Santos/pi-auch/-/commits/main)
+[![coverage](https://gitlab.com/Joao-O-Santos/pi-auch/badges/main/coverage.svg?job=check)](https://gitlab.com/Joao-O-Santos/pi-auch/-/pipelines)
+[![npm
+version](https://img.shields.io/npm/v/pi-auch.svg)](https://www.npmjs.com/package/pi-auch)
+[![npm
+downloads](https://img.shields.io/npm/dt/pi-auch.svg)](https://www.npmjs.com/package/pi-auch)
+[![license](https://img.shields.io/npm/l/pi-auch.svg)](https://gitlab.com/Joao-O-Santos/pi-auch/-/blob/main/LICENSE)
+
 Compact quota visibility for Pi's standard footer. It supports OpenAI Codex, GitHub Copilot, and OpenCode Go without sending model probes.
 
 ## Install

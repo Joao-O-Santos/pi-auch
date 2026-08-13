@@ -6,6 +6,7 @@ stages:
 
 check:
   stage: test
+  coverage: '/all files\s+\|\s+([0-9.]+)/'
   script:
     - npm ci
     - npm install --no-save @biomejs/biome@2.5.7
