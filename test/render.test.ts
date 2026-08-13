@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatDetail, formatFooter, providerForModel } from "../src/render.js";
+import { formatConfiguredFooter, formatDetail, formatFooter } from "../src/render.js";
 import type { QuotaMetric, QuotaState } from "../src/types.js";
 
 const unavailable: QuotaState = {
@@ -22,14 +22,6 @@ function ready(metrics: QuotaMetric[], stale = false): QuotaState {
 	};
 }
 
-test("selects only supported active providers", () => {
-	for (const provider of ["openai-codex", "github-copilot", "opencode-go"] as const) {
-		assert.equal(providerForModel(provider), provider);
-	}
-	assert.equal(providerForModel("anthropic"), undefined);
-	assert.equal(providerForModel(undefined), undefined);
-});
-
 test("renders loading, unavailable, and compact stale footer states", () => {
 	assert.equal(formatFooter("opencode-go", undefined), "Go …");
 	assert.equal(formatFooter("github-copilot", unavailable), "Copilot unavailable");
@@ -48,6 +40,23 @@ test("renders loading, unavailable, and compact stale footer states", () => {
 			},
 		}),
 		"Codex rolling 12% · weekly 55% (stale)",
+	);
+});
+
+test("formats all configured providers and omits missing credentials", () => {
+	const states = new Map([
+		["openai-codex", unavailable],
+		["github-copilot", ready([{ label: "chat", unlimited: true }])],
+		["opencode-go", { status: "unavailable", error: "OpenCode Go is not configured" }],
+	] as const);
+	assert.equal(formatConfiguredFooter(states), "Codex unavailable | Copilot chat ∞");
+	assert.equal(
+		formatConfiguredFooter(
+			new Map([
+				["openai-codex", { status: "unavailable", error: "Codex is not configured" }],
+			] as const),
+		),
+		undefined,
 	);
 });
 

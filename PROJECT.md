@@ -16,7 +16,7 @@
   - Codex: ChatGPT `wham/usage`.
   - GitHub Copilot: `copilot_internal/user`.
   - OpenCode Go: authenticated workspace dashboard usage.
-- {provisional} Show a compact status for the active model's provider in Pi's standard footer via `ctx.ui.setStatus()`.
+- {accepted} Show compact usage for every configured provider in Pi's standard footer via `ctx.ui.setStatus()`.
 - {provisional} Keep `/auch` as a secondary command for explicit refresh and provider details.
 
 ## Deliverable
@@ -36,7 +36,7 @@
 
 ## Completion criteria
 
-- The footer populates on session start and follows model changes.
+- The footer populates on session start with usage for all configured providers.
 - Quota data refreshes at a conservative interval and all session resources are cleaned up on shutdown.
 - `/auch` refreshes and reports all configured providers without revealing secrets.
 - Provider failures are isolated; stale successful data remains identifiable and usable.
@@ -45,5 +45,4 @@
 
 ## Unresolved
 
-- {unresolved} Final compact wording and whether the footer should show only the active provider or all three when terminal width permits. The initial implementation will use the active provider unless the owner chooses otherwise.
 - {unresolved} Whether to publish publicly; implementation and local installation do not imply publication.

@@ -23,7 +23,7 @@ To try it for one session without installing it:
 pi -e npm:pi-auch
 ```
 
-The active model's provider is shown in Pi's existing footer. Run `/auch` to refresh and display all provider details.
+Usage for every configured provider is shown in Pi's existing footer. Run `/auch` to refresh and display full provider details.
 
 ## Authentication
 

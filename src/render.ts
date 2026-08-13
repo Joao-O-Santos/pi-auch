@@ -6,12 +6,6 @@ const NAMES: Record<ProviderId, string> = {
 	"opencode-go": "Go",
 };
 
-export function providerForModel(provider: string | undefined): ProviderId | undefined {
-	if (provider === "openai-codex" || provider === "github-copilot" || provider === "opencode-go")
-		return provider;
-	return undefined;
-}
-
 function formatMetric(metric: QuotaMetric): string {
 	if (metric.unlimited) return `${metric.label} ∞`;
 	if (metric.remaining !== undefined && metric.limit !== undefined) {
@@ -28,6 +22,13 @@ export function formatFooter(provider: ProviderId, state: QuotaState | undefined
 	if (state.status === "unavailable") return `${name} unavailable`;
 	const metrics = prioritizedMetrics(provider, state.value.metrics).slice(0, 2).map(formatMetric);
 	return `${name} ${metrics.join(" · ")}${state.stale ? " (stale)" : ""}`;
+}
+
+export function formatConfiguredFooter(states: Map<ProviderId, QuotaState>): string | undefined {
+	const parts = [...states]
+		.filter(([, state]) => state.status === "ready" || !state.error.endsWith(" is not configured"))
+		.map(([provider, state]) => formatFooter(provider, state));
+	return parts.length > 0 ? parts.join(" | ") : undefined;
 }
 
 export function formatDetail(provider: ProviderId, state: QuotaState): string {

@@ -16,7 +16,6 @@ test("extension follows the complete session, model, command, and shutdown lifec
 	let command: CommandHandler | undefined;
 	const statuses: Array<string | undefined> = [];
 	const notices: Notice[] = [];
-	let provider: string | undefined = "openai-codex";
 	let intervalCallback: (() => void) | undefined;
 	const originalSetInterval = globalThis.setInterval;
 	globalThis.setInterval = ((callback: () => void) => {
@@ -34,10 +33,10 @@ test("extension follows the complete session, model, command, and shutdown lifec
 		},
 	} as unknown as ExtensionAPI;
 	const context = {
-		model: { provider },
+		model: { provider: "openai-codex" },
 		modelRegistry: {
-			async getProviderAuth() {
-				return undefined;
+			async getProviderAuth(providerName: string) {
+				return providerName === "github-copilot" ? { auth: { apiKey: "resolved" } } : undefined;
 			},
 		},
 		ui: {
@@ -54,29 +53,38 @@ test("extension follows the complete session, model, command, and shutdown lifec
 		globalThis.setInterval = originalSetInterval;
 	});
 	piAuch(pi);
-	assert.deepEqual([...handlers.keys()], ["session_start", "model_select", "session_shutdown"]);
+	assert.deepEqual([...handlers.keys()], ["session_start", "session_shutdown"]);
 	assert.ok(command);
 
 	await command("", context);
 	assert.equal(notices.at(-1)?.level, "warning");
+	const shutdown = handlers.get("session_shutdown");
+	assert.ok(shutdown);
+	await shutdown({} as never, context);
 
+	const originalFetch = globalThis.fetch;
+	globalThis.fetch = async () =>
+		new Response(
+			JSON.stringify({
+				quota_snapshots: {
+					chat: { unlimited: true },
+				},
+			}),
+			{ headers: { "content-type": "application/json" } },
+		);
+	t.after(() => {
+		globalThis.fetch = originalFetch;
+	});
 	await handlers.get("session_start")?.({} as never, context);
 	await handlers.get("session_start")?.({} as never, context);
 	intervalCallback?.();
 	await new Promise((resolve) => setImmediate(resolve));
-	assert.match(statuses.at(-1) ?? "", /^Codex/);
-
-	await handlers.get("model_select")?.({ model: { provider: "openai-codex" } } as never, context);
-	assert.match(statuses.at(-1) ?? "", /^Codex/);
-
-	provider = "anthropic";
-	await handlers.get("model_select")?.({ model: { provider } } as never, context);
-	assert.equal(statuses.at(-1), undefined);
+	assert.match(statuses.at(-1) ?? "", /Copilot chat ∞/);
 
 	await command("", context);
-	assert.equal(notices.at(-1)?.level, "warning");
+	assert.equal(notices.at(-1)?.level, "info");
 	assert.match(notices.at(-1)?.message ?? "", /Codex: unavailable/);
 
-	await handlers.get("session_shutdown")?.({} as never, context);
+	await shutdown({} as never, context);
 	assert.equal(statuses.at(-1), undefined);
 });
