@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 João Oliveira Santos
 
-.PHONY: all format typecheck style test coverage pack verify clean
+.PHONY: all format typecheck style test smoke coverage pack verify clean
 
 all: verify
 
@@ -16,6 +16,9 @@ style:
 
 test:
 	npm test
+
+smoke:
+	npm run smoke
 
 coverage:
 	npm run coverage

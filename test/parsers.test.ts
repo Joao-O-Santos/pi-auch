@@ -18,6 +18,17 @@ test("parses Codex weekly window only", () => {
 	assert.equal(value.metrics[0]?.resetAt, 1_800_000_000_000);
 });
 
+test("uses Codex primary window when it is the only quota window", () => {
+	const value = parseCodexUsage({
+		rate_limit: {
+			primary_window: { used_percent: 12.4, reset_at: 1_800_000_000 },
+		},
+	});
+	assert.deepEqual(value.metrics, [
+		{ label: "weekly", usedPercent: 12.4, resetAt: 1_800_000_000_000 },
+	]);
+});
+
 test("rejects malformed Codex usage", () => {
 	for (const input of [null, [], {}, { rate_limit: [] }]) {
 		assert.throws(() => parseCodexUsage(input), /invalid Codex/);

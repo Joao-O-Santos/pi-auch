@@ -64,3 +64,18 @@ npm install
 npm run check
 npm pack --dry-run
 ```
+
+Run the opt-in live smoke test from a development checkout to check the supported providers
+configured in the current Pi installation:
+
+```bash
+npm run smoke
+# or: make smoke
+```
+
+The smoke test resolves authentication through Pi's `ModelRuntime`; it does not inspect credential
+files, print authentication, or send model probes. Providers without a local subscription are
+skipped. Codex performs a bounded live quota request and requires weekly percentage and reset data.
+Copilot validates Pi authentication but cannot obtain passive quota until normal Copilot use returns
+quota headers. OpenCode Go fetches live dashboard quota when its optional dashboard configuration is
+present; otherwise it validates Pi authentication and reports `configured`.

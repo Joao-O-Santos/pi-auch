@@ -44,7 +44,7 @@ export function parseCodexUsage(value: unknown): QuotaResult {
 	if (!root || !rateLimit) throw new Error("invalid Codex usage response");
 
 	const metrics: QuotaMetric[] = [];
-	const window = record(rateLimit.secondary_window);
+	const window = record(rateLimit.secondary_window) ?? record(rateLimit.primary_window);
 	const usedPercent = percent(window?.used_percent);
 	if (usedPercent !== undefined) {
 		const resetAt = timestamp(window?.reset_at);

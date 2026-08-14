@@ -1,0 +1,47 @@
+{
+	"version": 2,
+	"confirmedAt": "2026-08-14T00:23:17.667Z",
+	"artifacts": [
+		{
+			"path": "PROJECT.md",
+			"fingerprint": "sha256:e994d070b62d47dc730f625f9b11fd420bc8991dd7e0e98e9a3fbc57aea66321",
+			"status": "current",
+			"role": "project",
+			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
+			"acknowledgement": {
+				"at": "2026-08-14T00:23:17.667Z",
+				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+			}
+		},
+		{
+			"path": "README.md",
+			"fingerprint": "sha256:3a53714a5fc29125e29344e583036690918af6612104bf0eae9fdbd6f60a209c",
+			"status": "current",
+			"role": "documentation",
+			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
+			"updateFrom": ["PROJECT.md", "package.json"],
+			"acknowledgement": {
+				"at": "2026-08-14T00:23:17.667Z",
+				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+			}
+		},
+		{
+			"path": "package.json",
+			"fingerprint": "sha256:85c1d7d297b80efbcca9ba3573f38e28b65d441951eaa82d078c4e3fadf7cafb",
+			"status": "current",
+			"role": "package-boundary",
+			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
+			"acknowledgement": {
+				"at": "2026-08-14T00:23:17.667Z",
+				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+			}
+		},
+		{
+			"path": "THIRD_PARTY_NOTICES.md",
+			"fingerprint": "sha256:295759cad7f118a8de00a02a6433fd28ad1b9613c7cca381007746c611f9ffb0",
+			"status": "current",
+			"role": "attribution",
+			"authoritativeFor": ["third-party-attribution"]
+		}
+	]
+}

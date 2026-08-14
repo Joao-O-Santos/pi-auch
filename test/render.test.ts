@@ -40,6 +40,21 @@ test("renders loading, unavailable, and label-free single-metric footer states",
 	);
 });
 
+test("renders Codex percentage with days until reset", (t) => {
+	t.mock.method(Date, "now", () => 1_000_000);
+	const state: QuotaState = {
+		status: "ready",
+		stale: false,
+		value: {
+			provider: "openai-codex",
+			fetchedAt: 1,
+			metrics: [{ label: "weekly", usedPercent: 55, resetAt: 1_000_000 + 2.54 * 86_400_000 }],
+		},
+	};
+	assert.equal(formatFooter("openai-codex", state), "Codex 55%/2.5d");
+	assert.equal(formatDetail("openai-codex", state), "Codex: 55%/2.5d");
+});
+
 test("keeps window labels when a provider reports multiple metrics", () => {
 	const state: QuotaState = {
 		status: "ready",

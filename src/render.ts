@@ -6,7 +6,7 @@ const NAMES: Record<ProviderId, string> = {
 	"opencode-go": "Go",
 };
 
-function formatMetric(metric: QuotaMetric, showLabel: boolean): string {
+function formatMetric(metric: QuotaMetric, showLabel: boolean, showResetDays = false): string {
 	if (metric.unlimited) return showLabel ? `${metric.label} ∞` : "∞";
 	if (metric.remaining !== undefined && metric.limit !== undefined) {
 		return showLabel
@@ -14,7 +14,11 @@ function formatMetric(metric: QuotaMetric, showLabel: boolean): string {
 			: `${metric.remaining}/${metric.limit} left`;
 	}
 	if (metric.usedPercent !== undefined) {
-		const percent = `${Math.round(metric.usedPercent)}%`;
+		const reset =
+			showResetDays && metric.resetAt !== undefined
+				? `/${(Math.max(0, metric.resetAt - Date.now()) / 86_400_000).toFixed(1)}d`
+				: "";
+		const percent = `${Math.round(metric.usedPercent)}%${reset}`;
 		return showLabel ? `${metric.label} ${percent}` : percent;
 	}
 	if (metric.remaining !== undefined) {
@@ -28,7 +32,9 @@ export function formatFooter(provider: ProviderId, state: QuotaState | undefined
 	if (!state) return `${name} …`;
 	if (state.status === "unavailable") return `${name} unavailable`;
 	const metrics = prioritizedMetrics(provider, state.value.metrics).slice(0, 2);
-	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1));
+	const formatted = metrics.map((item) =>
+		formatMetric(item, metrics.length > 1, provider === "openai-codex"),
+	);
 	return `${name} ${formatted.join(" · ")}${state.stale ? " (stale)" : ""}`;
 }
 
@@ -44,7 +50,9 @@ export function formatDetail(provider: ProviderId, state: QuotaState): string {
 	if (state.status === "unavailable") return `${name}: unavailable — ${state.error}`;
 	const plan = state.value.plan ? ` (${state.value.plan})` : "";
 	const metrics = prioritizedMetrics(provider, state.value.metrics);
-	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1)).join(" · ");
+	const formatted = metrics
+		.map((item) => formatMetric(item, metrics.length > 1, provider === "openai-codex"))
+		.join(" · ");
 	const stale = state.stale ? ` [stale${state.error ? `: ${state.error}` : ""}]` : "";
 	return `${name}${plan}: ${formatted}${stale}`;
 }
