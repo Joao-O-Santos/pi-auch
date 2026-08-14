@@ -6,13 +6,20 @@ const NAMES: Record<ProviderId, string> = {
 	"opencode-go": "Go",
 };
 
-function formatMetric(metric: QuotaMetric): string {
-	if (metric.unlimited) return `${metric.label} ∞`;
+function formatMetric(metric: QuotaMetric, showLabel: boolean): string {
+	if (metric.unlimited) return showLabel ? `${metric.label} ∞` : "∞";
 	if (metric.remaining !== undefined && metric.limit !== undefined) {
-		return `${metric.label} ${metric.remaining}/${metric.limit} left`;
+		return showLabel
+			? `${metric.label} ${metric.remaining}/${metric.limit} left`
+			: `${metric.remaining}/${metric.limit} left`;
 	}
-	if (metric.usedPercent !== undefined) return `${metric.label} ${Math.round(metric.usedPercent)}%`;
-	if (metric.remaining !== undefined) return `${metric.label} ${metric.remaining} left`;
+	if (metric.usedPercent !== undefined) {
+		const percent = `${Math.round(metric.usedPercent)}%`;
+		return showLabel ? `${metric.label} ${percent}` : percent;
+	}
+	if (metric.remaining !== undefined) {
+		return showLabel ? `${metric.label} ${metric.remaining} left` : `${metric.remaining} left`;
+	}
 	return metric.label;
 }
 
@@ -20,8 +27,9 @@ export function formatFooter(provider: ProviderId, state: QuotaState | undefined
 	const name = NAMES[provider];
 	if (!state) return `${name} …`;
 	if (state.status === "unavailable") return `${name} unavailable`;
-	const metrics = prioritizedMetrics(provider, state.value.metrics).slice(0, 2).map(formatMetric);
-	return `${name} ${metrics.join(" · ")}${state.stale ? " (stale)" : ""}`;
+	const metrics = prioritizedMetrics(provider, state.value.metrics).slice(0, 2);
+	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1));
+	return `${name} ${formatted.join(" · ")}${state.stale ? " (stale)" : ""}`;
 }
 
 export function formatConfiguredFooter(states: Map<ProviderId, QuotaState>): string | undefined {
@@ -35,9 +43,10 @@ export function formatDetail(provider: ProviderId, state: QuotaState): string {
 	const name = NAMES[provider];
 	if (state.status === "unavailable") return `${name}: unavailable — ${state.error}`;
 	const plan = state.value.plan ? ` (${state.value.plan})` : "";
-	const metrics = prioritizedMetrics(provider, state.value.metrics).map(formatMetric).join(" · ");
+	const metrics = prioritizedMetrics(provider, state.value.metrics);
+	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1)).join(" · ");
 	const stale = state.stale ? ` [stale${state.error ? `: ${state.error}` : ""}]` : "";
-	return `${name}${plan}: ${metrics}${stale}`;
+	return `${name}${plan}: ${formatted}${stale}`;
 }
 
 function prioritizedMetrics(provider: ProviderId, metrics: QuotaMetric[]): QuotaMetric[] {

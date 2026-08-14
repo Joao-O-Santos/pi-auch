@@ -40,6 +40,10 @@ function configured(provider: ProviderId): QuotaResult {
 	return { provider, fetchedAt: Date.now(), metrics: [{ label: "configured" }] };
 }
 
+function passiveOrConfigured(readPassive: ReadPassiveUsage, provider: ProviderId): QuotaResult {
+	return readPassive(provider) ?? configured(provider);
+}
+
 export function createReaders(
 	resolveAuth: ResolveProviderAuth,
 	readPassive: ReadPassiveUsage = () => undefined,
@@ -68,7 +72,7 @@ export function createReaders(
 			id: "github-copilot",
 			async read() {
 				token(await resolveAuth("github-copilot"), "Copilot");
-				return readPassive("github-copilot") ?? configured("github-copilot");
+				return passiveOrConfigured(readPassive, "github-copilot");
 			},
 		},
 		{
@@ -77,7 +81,7 @@ export function createReaders(
 				token(await resolveAuth("opencode-go"), "OpenCode Go");
 				const state = getOpenCodeGoConfig();
 				if ("error" in state) throw new Error(state.error);
-				if (!("config" in state)) return readPassive("opencode-go") ?? configured("opencode-go");
+				if (!("config" in state)) return passiveOrConfigured(readPassive, "opencode-go");
 				const html = await boundedFetch(
 					`${OPENCODE_USAGE_URL}/${encodeURIComponent(state.config.workspaceId)}/go`,
 					{

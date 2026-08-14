@@ -1,4 +1,4 @@
-import type { ProviderId, ProviderReader, QuotaState } from "./types.js";
+import type { ProviderId, ProviderReader, QuotaResult, QuotaState } from "./types.js";
 
 export class QuotaCache {
 	private readonly readers: Map<ProviderId, ProviderReader>;
@@ -14,7 +14,7 @@ export class QuotaCache {
 		return this.states.get(provider);
 	}
 
-	store(value: import("./types.js").QuotaResult): void {
+	store(value: QuotaResult): void {
 		this.states.set(value.provider, { status: "ready", value, stale: false });
 	}
 

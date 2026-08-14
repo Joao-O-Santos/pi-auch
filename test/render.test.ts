@@ -22,7 +22,7 @@ function ready(metrics: QuotaMetric[], stale = false): QuotaState {
 	};
 }
 
-test("renders loading, unavailable, and compact stale footer states", () => {
+test("renders loading, unavailable, and label-free single-metric footer states", () => {
 	assert.equal(formatFooter("opencode-go", undefined), "Go …");
 	assert.equal(formatFooter("github-copilot", unavailable), "Copilot unavailable");
 	assert.equal(
@@ -33,14 +33,29 @@ test("renders loading, unavailable, and compact stale footer states", () => {
 			value: {
 				provider: "openai-codex",
 				fetchedAt: 1,
-				metrics: [
-					{ label: "rolling", usedPercent: 12.4 },
-					{ label: "weekly", usedPercent: 55 },
-				],
+				metrics: [{ label: "weekly", usedPercent: 55 }],
 			},
 		}),
-		"Codex rolling 12% · weekly 55% (stale)",
+		"Codex 55% (stale)",
 	);
+});
+
+test("keeps window labels when a provider reports multiple metrics", () => {
+	const state: QuotaState = {
+		status: "ready",
+		stale: false,
+		value: {
+			provider: "opencode-go",
+			fetchedAt: 1,
+			metrics: [
+				{ label: "rolling", usedPercent: 12 },
+				{ label: "weekly", usedPercent: 40 },
+				{ label: "monthly", usedPercent: 100 },
+			],
+		},
+	};
+	assert.equal(formatFooter("opencode-go", state), "Go rolling 12% · weekly 40%");
+	assert.equal(formatDetail("opencode-go", state), "Go: rolling 12% · weekly 40% · monthly 100%");
 });
 
 test("formats all configured providers and omits missing credentials", () => {
@@ -49,7 +64,7 @@ test("formats all configured providers and omits missing credentials", () => {
 		["github-copilot", ready([{ label: "chat", unlimited: true }])],
 		["opencode-go", { status: "unavailable", error: "OpenCode Go is not configured" }],
 	] as const);
-	assert.equal(formatConfiguredFooter(states), "Codex unavailable | Copilot chat ∞");
+	assert.equal(formatConfiguredFooter(states), "Codex unavailable | Copilot ∞");
 	assert.equal(
 		formatConfiguredFooter(
 			new Map([

@@ -1,4 +1,4 @@
-import type { ProviderId, QuotaMetric, QuotaResult } from "./types.js";
+import { type ProviderId, QUOTA_WINDOWS, type QuotaMetric, type QuotaResult } from "./types.js";
 
 // Header families and quota-window conventions adapted from pi-usage (MIT); see THIRD_PARTY_NOTICES.md.
 
@@ -66,24 +66,24 @@ function result(provider: ProviderId, metrics: QuotaMetric[]): QuotaResult {
 	return { provider, fetchedAt: Date.now(), metrics };
 }
 
+/** Fallback signal for a rate-limited response with no recognized quota metrics. */
+function rateLimited(headers: Record<string, string>, provider: ProviderId): QuotaResult {
+	const retry = number(headers, "retry-after");
+	return result(provider, [
+		{
+			label: "rate limited",
+			...(retry !== undefined ? { resetAt: Date.now() + Math.max(0, retry) * 1000 } : {}),
+		},
+	]);
+}
+
 export function parseCopilotHeaders(
 	headers: Record<string, string>,
 	status: number,
 ): QuotaResult | undefined {
-	const metrics = [
-		metric(headers, "x-copilot-premium-requests", "premium requests"),
-		metric(headers, "x-ratelimit", "requests"),
-	].filter((value): value is QuotaMetric => value !== undefined);
-	if (metrics.length > 0) return result("github-copilot", metrics);
-	if (status === 429) {
-		const retry = number(headers, "retry-after");
-		return result("github-copilot", [
-			{
-				label: "rate limited",
-				...(retry !== undefined ? { resetAt: Date.now() + Math.max(0, retry) * 1000 } : {}),
-			},
-		]);
-	}
+	const premium = metric(headers, "x-copilot-premium-requests", "premium requests");
+	if (premium) return result("github-copilot", [premium]);
+	if (status === 429) return rateLimited(headers, "github-copilot");
 	return undefined;
 }
 
@@ -101,10 +101,10 @@ export function parseOpenCodeGoHeaders(
 	headers: Record<string, string>,
 	status: number,
 ): QuotaResult | undefined {
-	const metrics = ["rolling", "weekly", "monthly"]
-		.map((window) => goMetric(headers, window))
-		.filter((value): value is QuotaMetric => value !== undefined);
+	const metrics = QUOTA_WINDOWS.map((window) => goMetric(headers, window)).filter(
+		(value): value is QuotaMetric => value !== undefined,
+	);
 	if (metrics.length > 0) return result("opencode-go", metrics);
-	if (status === 429) return result("opencode-go", [{ label: "rate limited" }]);
+	if (status === 429) return rateLimited(headers, "opencode-go");
 	return undefined;
 }

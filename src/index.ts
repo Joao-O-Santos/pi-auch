@@ -8,6 +8,13 @@ import { PROVIDERS, type ProviderId, type QuotaResult } from "./types.js";
 const STATUS_KEY = "pi-auch";
 const REFRESH_MS = 15 * 60 * 1000;
 
+const PASSIVE_PARSERS: Partial<
+	Record<ProviderId, (headers: Record<string, string>, status: number) => QuotaResult | undefined>
+> = {
+	"github-copilot": parseCopilotHeaders,
+	"opencode-go": parseOpenCodeGoHeaders,
+};
+
 export default function piAuch(pi: ExtensionAPI) {
 	let resolveAuth: (provider: string) => Promise<ProviderAuth | undefined> = async () => undefined;
 	const passive = new Map<ProviderId, QuotaResult>();
@@ -54,13 +61,8 @@ export default function piAuch(pi: ExtensionAPI) {
 	};
 	pi.on("session_shutdown", (_event, ctx) => shutdown(ctx));
 	pi.on("after_provider_response", (event, ctx) => {
-		const provider = ctx.model?.provider;
-		const value =
-			provider === "github-copilot"
-				? parseCopilotHeaders(event.headers, event.status)
-				: provider === "opencode-go"
-					? parseOpenCodeGoHeaders(event.headers, event.status)
-					: undefined;
+		const provider = ctx.model?.provider as ProviderId | undefined;
+		const value = provider && PASSIVE_PARSERS[provider]?.(event.headers, event.status);
 		if (!value) return;
 		passive.set(value.provider, value);
 		cache.store(value);

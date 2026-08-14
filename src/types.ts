@@ -2,6 +2,10 @@ export const PROVIDERS = ["openai-codex", "github-copilot", "opencode-go"] as co
 
 export type ProviderId = (typeof PROVIDERS)[number];
 
+export const QUOTA_WINDOWS = ["rolling", "weekly", "monthly"] as const;
+
+export type QuotaWindow = (typeof QUOTA_WINDOWS)[number];
+
 export interface QuotaMetric {
 	label: string;
 	usedPercent?: number;

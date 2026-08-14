@@ -2,21 +2,18 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { parseCodexUsage, parseOpenCodeUsage } from "../src/parse.js";
 
-test("parses Codex rolling and weekly windows", () => {
+test("parses Codex weekly window only", () => {
 	const value = parseCodexUsage({
 		plan_type: "plus",
 		rate_limit: {
-			primary_window: { used_percent: 12.4, reset_at: 1_800_000_000 },
-			secondary_window: { used_percent: 55 },
+			primary_window: { used_percent: 12.4 },
+			secondary_window: { used_percent: 55, reset_at: 1_800_000_000 },
 		},
 	});
 	assert.equal(value.plan, "plus");
 	assert.deepEqual(
 		value.metrics.map(({ label, usedPercent }) => ({ label, usedPercent })),
-		[
-			{ label: "rolling", usedPercent: 12.4 },
-			{ label: "weekly", usedPercent: 55 },
-		],
+		[{ label: "weekly", usedPercent: 55 }],
 	);
 	assert.equal(value.metrics[0]?.resetAt, 1_800_000_000_000);
 });

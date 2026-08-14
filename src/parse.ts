@@ -1,4 +1,4 @@
-import type { ProviderId, QuotaMetric, QuotaResult } from "./types.js";
+import { type ProviderId, QUOTA_WINDOWS, type QuotaMetric, type QuotaResult } from "./types.js";
 
 type RecordValue = Record<string, unknown>;
 
@@ -44,17 +44,12 @@ export function parseCodexUsage(value: unknown): QuotaResult {
 	if (!root || !rateLimit) throw new Error("invalid Codex usage response");
 
 	const metrics: QuotaMetric[] = [];
-	for (const [key, label] of [
-		["primary_window", "rolling"],
-		["secondary_window", "weekly"],
-	] as const) {
-		const window = record(rateLimit[key]);
-		if (!window) continue;
-		const usedPercent = percent(window.used_percent);
-		if (usedPercent === undefined) continue;
-		const resetAt = timestamp(window.reset_at);
+	const window = record(rateLimit.secondary_window);
+	const usedPercent = percent(window?.used_percent);
+	if (usedPercent !== undefined) {
+		const resetAt = timestamp(window?.reset_at);
 		metrics.push({
-			label,
+			label: "weekly",
 			usedPercent,
 			...(resetAt !== undefined ? { resetAt } : {}),
 		});
@@ -72,7 +67,7 @@ function decodeEntities(text: string): string {
 
 export function parseOpenCodeUsage(html: string): QuotaResult {
 	const metrics: QuotaMetric[] = [];
-	for (const label of ["rolling", "weekly", "monthly"] as const) {
+	for (const label of QUOTA_WINDOWS) {
 		const embedded = new RegExp(`${label}Usage:\\$R\\[\\d+\\]=\\{([^}]*)\\}`).exec(html)?.[1];
 		const usage = embedded ? /usagePercent:(\d+(?:\.\d+)?)/.exec(embedded)?.[1] : undefined;
 		if (!usage) continue;
@@ -93,7 +88,7 @@ export function parseOpenCodeUsage(html: string): QuotaResult {
 			.replaceAll(/<[^>]+>/g, " "),
 	).replaceAll(/\s+/g, " ");
 
-	for (const label of ["rolling", "weekly", "monthly"] as const) {
+	for (const label of QUOTA_WINDOWS) {
 		if (metrics.some((metric) => metric.label === label)) continue;
 		const match = text.match(
 			new RegExp(`\\b${label}\\b[^%]{0,100}?((?:100|\\d{1,2})(?:\\.\\d+)?)\\s*%`, "i"),

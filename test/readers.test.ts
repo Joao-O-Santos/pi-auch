@@ -38,7 +38,7 @@ function reader(auth: Partial<Record<string, ProviderAuth>>, index: number) {
 
 test("Codex reader uses Pi-resolved auth and account claim", async () => {
 	await withFetch(
-		new Response('{"rate_limit":{"primary_window":{"used_percent":12}}}', {
+		new Response('{"rate_limit":{"secondary_window":{"used_percent":12}}}', {
 			headers: { "content-type": "application/json" },
 		}),
 		async (calls) => {
