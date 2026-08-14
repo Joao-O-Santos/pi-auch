@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-08-14T00:23:17.667Z",
+	"confirmedAt": "2026-08-14T00:25:09.637Z",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:e994d070b62d47dc730f625f9b11fd420bc8991dd7e0e98e9a3fbc57aea66321",
+			"fingerprint": "sha256:3f14c3b6d5960e441546b9860b9c162dbd1703ae358c6f971a75a6e2fcd39501",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-08-14T00:23:17.667Z",
-				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+				"at": "2026-08-14T00:25:09.637Z",
+				"reason": "Recorded the completed signed v0.1.6 release after the successful GitLab check job; README remains accurate. Immediate work is post-release installation verification."
 			}
 		},
 		{
@@ -21,8 +21,8 @@
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-08-14T00:23:17.667Z",
-				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+				"at": "2026-08-14T00:25:09.637Z",
+				"reason": "Recorded the completed signed v0.1.6 release after the successful GitLab check job; README remains accurate. Immediate work is post-release installation verification."
 			}
 		},
 		{

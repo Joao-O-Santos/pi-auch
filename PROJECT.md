@@ -52,13 +52,13 @@
 
 ## Previous action
 
-- Released and tagged `v0.1.5` with weekly-only Codex display and simplified Copilot quota reporting.
+- Released and tagged `v0.1.6` after the GitLab `check` job passed; it fixes primary-only Codex quota responses, adds reset-day rendering, and adds opt-in authenticated smoke checks.
 - Identified that some Codex accounts expose their weekly quota as the sole `primary_window`; implemented and verified a fallback plus reset-day rendering locally.
 - Added an opt-in developer smoke test that uses Pi-resolved authentication without model probes; the local run confirmed live Codex quota and reset data plus configured Copilot and Go subscriptions.
 
 ## Immediate next step
 
-- Push version `0.1.6`; create and push its signed release tag after the GitLab `check` job passes.
+- Monitor `v0.1.6` installation and confirm the corrected Codex footer in normal Pi use.
 
 ## Unresolved
 
