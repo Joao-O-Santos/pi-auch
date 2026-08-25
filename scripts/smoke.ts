@@ -8,14 +8,15 @@ const READ_TIMEOUT_MS = 15_000;
 const NAMES: Record<ProviderId, string> = {
 	"openai-codex": "Codex",
 	"github-copilot": "Copilot",
-	"opencode-go": "OpenCode Go",
 };
 
 function validateLiveResult(value: QuotaResult): void {
 	if (value.provider !== "openai-codex") return;
-	const weekly = value.metrics.find((metric) => metric.label === "weekly");
-	if (weekly?.usedPercent === undefined) throw new Error("weekly quota is missing");
-	if (weekly.resetAt === undefined) throw new Error("weekly reset time is missing");
+	for (const label of ["5h", "weekly"]) {
+		const metric = value.metrics.find((candidate) => candidate.label === label);
+		if (metric?.usedPercent === undefined) throw new Error(`${label} quota is missing`);
+		if (metric.resetAt === undefined) throw new Error(`${label} reset time is missing`);
+	}
 }
 
 async function main(): Promise<void> {

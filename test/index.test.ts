@@ -82,10 +82,16 @@ test("extension follows the complete session, model, command, and shutdown lifec
 	assert.match(statuses.at(-1) ?? "", /Copilot 25%/);
 	await handlers.get("after_provider_response")?.({ status: 200, headers: {} }, context);
 	assert.match(statuses.at(-1) ?? "", /Copilot 25%/);
-	context.model = { provider: "opencode-go" } as typeof context.model;
-	await handlers.get("after_provider_response")?.({ status: 200, headers: {} }, context);
-	assert.match(statuses.at(-1) ?? "", /Copilot 25%/);
-	context.model = { provider: "github-copilot" } as typeof context.model;
+	await handlers.get("after_provider_response")?.(
+		{ status: 200, headers: { "x-ratelimit-used-percent": "10" } },
+		context,
+	);
+	assert.match(statuses.at(-1) ?? "", /Copilot premium 25% · requests 10%/);
+	await handlers.get("after_provider_response")?.(
+		{ status: 429, headers: { "retry-after": "2" } },
+		context,
+	);
+	assert.match(statuses.at(-1) ?? "", /Copilot rate limited/);
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
 	context.model = { provider: "openai-codex" } as typeof context.model;
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);

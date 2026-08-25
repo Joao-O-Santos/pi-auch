@@ -23,7 +23,7 @@ function ready(metrics: QuotaMetric[], stale = false): QuotaState {
 }
 
 test("renders loading, unavailable, and label-free single-metric footer states", () => {
-	assert.equal(formatFooter("opencode-go", undefined), "Go …");
+	assert.equal(formatFooter("github-copilot", undefined), "Copilot …");
 	assert.equal(formatFooter("github-copilot", unavailable), "Copilot unavailable");
 	assert.equal(
 		formatFooter("openai-codex", {
@@ -40,7 +40,7 @@ test("renders loading, unavailable, and label-free single-metric footer states",
 	);
 });
 
-test("renders Codex percentage with days until reset", (t) => {
+test("renders Codex 5h and weekly percentages with appropriate reset units", (t) => {
 	t.mock.method(Date, "now", () => 1_000_000);
 	const state: QuotaState = {
 		status: "ready",
@@ -48,36 +48,20 @@ test("renders Codex percentage with days until reset", (t) => {
 		value: {
 			provider: "openai-codex",
 			fetchedAt: 1,
-			metrics: [{ label: "weekly", usedPercent: 55, resetAt: 1_000_000 + 2.54 * 86_400_000 }],
-		},
-	};
-	assert.equal(formatFooter("openai-codex", state), "Codex 55%/2.5d");
-	assert.equal(formatDetail("openai-codex", state), "Codex: 55%/2.5d");
-});
-
-test("keeps window labels when a provider reports multiple metrics", () => {
-	const state: QuotaState = {
-		status: "ready",
-		stale: false,
-		value: {
-			provider: "opencode-go",
-			fetchedAt: 1,
 			metrics: [
-				{ label: "rolling", usedPercent: 12 },
-				{ label: "weekly", usedPercent: 40 },
-				{ label: "monthly", usedPercent: 100 },
+				{ label: "5h", usedPercent: 12, resetAt: 1_000_000 + 4.54 * 3_600_000 },
+				{ label: "weekly", usedPercent: 55, resetAt: 1_000_000 + 2.54 * 86_400_000 },
 			],
 		},
 	};
-	assert.equal(formatFooter("opencode-go", state), "Go rolling 12% · weekly 40%");
-	assert.equal(formatDetail("opencode-go", state), "Go: rolling 12% · weekly 40% · monthly 100%");
+	assert.equal(formatFooter("openai-codex", state), "Codex 5h 12%/4.5h · weekly 55%/2.5d");
+	assert.equal(formatDetail("openai-codex", state), "Codex: 5h 12%/4.5h · weekly 55%/2.5d");
 });
 
 test("formats all configured providers and omits missing credentials", () => {
 	const states = new Map([
 		["openai-codex", unavailable],
 		["github-copilot", ready([{ label: "chat", unlimited: true }])],
-		["opencode-go", { status: "unavailable", error: "OpenCode Go is not configured" }],
 	] as const);
 	assert.equal(formatConfiguredFooter(states), "Codex unavailable | Copilot ∞");
 	assert.equal(
@@ -90,26 +74,35 @@ test("formats all configured providers and omits missing credentials", () => {
 	);
 });
 
-test("formats and prioritizes every metric representation", () => {
+test("formats and prioritizes detailed Copilot metrics and reset units", (t) => {
+	t.mock.method(Date, "now", () => 1_000_000);
 	const state = ready([
-		{ label: "other", remaining: 3 },
+		{ label: "other", remaining: 3, resetAt: 1_000_000 + 3 * 60_000 },
 		{ label: "chat", unlimited: true },
-		{ label: "premium interactions", remaining: 8, limit: 10 },
+		{
+			label: "premium interactions",
+			remaining: 8,
+			limit: 10,
+			resetAt: 1_000_000 + 3 * 3_600_000,
+		},
 		{ label: "completions", usedPercent: 20 },
-		{ label: "unknown" },
+		{ label: "unknown", resetAt: 1_000_000 + 30_000 },
 	]);
 	assert.equal(
 		formatFooter("github-copilot", state),
-		"Copilot premium interactions 8/10 left · chat ∞",
+		"Copilot premium interactions 8/10 left/3.0h · chat ∞",
 	);
 	assert.equal(
 		formatDetail("github-copilot", state),
-		"Copilot (pro): premium interactions 8/10 left · chat ∞ · other 3 left · completions 20% · unknown",
+		"Copilot (pro): premium interactions 8/10 left/3.0h · chat ∞ · other 3 left/3m · completions 20% · unknown/30s",
 	);
 });
 
 test("formats unavailable and stale details, including absent stale error", () => {
-	assert.equal(formatDetail("opencode-go", unavailable), "Go: unavailable — not configured");
+	assert.equal(
+		formatDetail("github-copilot", unavailable),
+		"Copilot: unavailable — not configured",
+	);
 	assert.match(
 		formatDetail("github-copilot", ready([{ label: "chat", unlimited: true }], true)),
 		/\[stale: offline\]$/,

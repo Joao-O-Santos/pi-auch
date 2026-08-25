@@ -3,28 +3,35 @@ import type { ProviderId, QuotaMetric, QuotaState } from "./types.js";
 const NAMES: Record<ProviderId, string> = {
 	"openai-codex": "Codex",
 	"github-copilot": "Copilot",
-	"opencode-go": "Go",
 };
 
-function formatMetric(metric: QuotaMetric, showLabel: boolean, showResetDays = false): string {
+function resetSuffix(resetAt: number | undefined): string {
+	if (resetAt === undefined) return "";
+	const milliseconds = Math.max(0, resetAt - Date.now());
+	if (milliseconds >= 2 * 86_400_000) return `/${(milliseconds / 86_400_000).toFixed(1)}d`;
+	if (milliseconds >= 2 * 3_600_000) return `/${(milliseconds / 3_600_000).toFixed(1)}h`;
+	if (milliseconds >= 2 * 60_000) return `/${Math.ceil(milliseconds / 60_000)}m`;
+	return `/${Math.ceil(milliseconds / 1000)}s`;
+}
+
+function formatMetric(metric: QuotaMetric, showLabel: boolean): string {
+	const reset = resetSuffix(metric.resetAt);
 	if (metric.unlimited) return showLabel ? `${metric.label} ∞` : "∞";
 	if (metric.remaining !== undefined && metric.limit !== undefined) {
 		return showLabel
-			? `${metric.label} ${metric.remaining}/${metric.limit} left`
-			: `${metric.remaining}/${metric.limit} left`;
+			? `${metric.label} ${metric.remaining}/${metric.limit} left${reset}`
+			: `${metric.remaining}/${metric.limit} left${reset}`;
 	}
 	if (metric.usedPercent !== undefined) {
-		const reset =
-			showResetDays && metric.resetAt !== undefined
-				? `/${(Math.max(0, metric.resetAt - Date.now()) / 86_400_000).toFixed(1)}d`
-				: "";
 		const percent = `${Math.round(metric.usedPercent)}%${reset}`;
 		return showLabel ? `${metric.label} ${percent}` : percent;
 	}
 	if (metric.remaining !== undefined) {
-		return showLabel ? `${metric.label} ${metric.remaining} left` : `${metric.remaining} left`;
+		return showLabel
+			? `${metric.label} ${metric.remaining} left${reset}`
+			: `${metric.remaining} left${reset}`;
 	}
-	return metric.label;
+	return `${metric.label}${reset}`;
 }
 
 export function formatFooter(provider: ProviderId, state: QuotaState | undefined): string {
@@ -32,9 +39,7 @@ export function formatFooter(provider: ProviderId, state: QuotaState | undefined
 	if (!state) return `${name} …`;
 	if (state.status === "unavailable") return `${name} unavailable`;
 	const metrics = prioritizedMetrics(provider, state.value.metrics).slice(0, 2);
-	const formatted = metrics.map((item) =>
-		formatMetric(item, metrics.length > 1, provider === "openai-codex"),
-	);
+	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1));
 	return `${name} ${formatted.join(" · ")}${state.stale ? " (stale)" : ""}`;
 }
 
@@ -50,9 +55,7 @@ export function formatDetail(provider: ProviderId, state: QuotaState): string {
 	if (state.status === "unavailable") return `${name}: unavailable — ${state.error}`;
 	const plan = state.value.plan ? ` (${state.value.plan})` : "";
 	const metrics = prioritizedMetrics(provider, state.value.metrics);
-	const formatted = metrics
-		.map((item) => formatMetric(item, metrics.length > 1, provider === "openai-codex"))
-		.join(" · ");
+	const formatted = metrics.map((item) => formatMetric(item, metrics.length > 1)).join(" · ");
 	const stale = state.stale ? ` [stale${state.error ? `: ${state.error}` : ""}]` : "";
 	return `${name}${plan}: ${formatted}${stale}`;
 }
@@ -61,7 +64,7 @@ function prioritizedMetrics(provider: ProviderId, metrics: QuotaMetric[]): Quota
 	if (provider !== "github-copilot") return metrics;
 	return [...metrics].sort((a, b) => {
 		const rank = (label: string) =>
-			label === "premium interactions" ? 0 : label === "chat" ? 1 : 2;
+			label.startsWith("premium") ? 0 : label === "requests" || label === "chat" ? 1 : 2;
 		return rank(a.label) - rank(b.label);
 	});
 }

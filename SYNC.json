@@ -1,47 +1,51 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-08-14T00:25:09.637Z",
+	"confirmedAt": "2026-08-25T17:57:39.543Z",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:3f14c3b6d5960e441546b9860b9c162dbd1703ae358c6f971a75a6e2fcd39501",
+			"fingerprint": "sha256:a09339edc3581a9414ffbee3eae76053bbc5e3cf491d5da01f97acd75a81e16e",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-08-14T00:25:09.637Z",
-				"reason": "Recorded the completed signed v0.1.6 release after the successful GitLab check job; README remains accurate. Immediate work is post-release installation verification."
+				"at": "2026-08-25T17:57:39.543Z",
+				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
 			}
 		},
 		{
 			"path": "README.md",
-			"fingerprint": "sha256:3a53714a5fc29125e29344e583036690918af6612104bf0eae9fdbd6f60a209c",
+			"fingerprint": "sha256:ee9ca10b35b4fecfc6982b8cf83f97cd7d28016e4c7f5e9dc0327d8b3c571eb0",
 			"status": "current",
 			"role": "documentation",
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-08-14T00:25:09.637Z",
-				"reason": "Recorded the completed signed v0.1.6 release after the successful GitLab check job; README remains accurate. Immediate work is post-release installation verification."
+				"at": "2026-08-25T17:57:39.543Z",
+				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
 			}
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:85c1d7d297b80efbcca9ba3573f38e28b65d441951eaa82d078c4e3fadf7cafb",
+			"fingerprint": "sha256:984a2ca953da927acfe6bc5f9177403aea4b7646a9a8cb606d45b94ada3237d4",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-08-14T00:23:17.667Z",
-				"reason": "Prepared version 0.1.6 after full verification and an authenticated smoke run; README remains accurate. Release tagging is explicitly pending the GitLab check job."
+				"at": "2026-08-25T17:57:39.543Z",
+				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
 			}
 		},
 		{
 			"path": "THIRD_PARTY_NOTICES.md",
-			"fingerprint": "sha256:295759cad7f118a8de00a02a6433fd28ad1b9613c7cca381007746c611f9ffb0",
+			"fingerprint": "sha256:447d6ae8ad425ddbac9d14d4de73798258554144b0cbc19144124259d9467360",
 			"status": "current",
 			"role": "attribution",
-			"authoritativeFor": ["third-party-attribution"]
+			"authoritativeFor": ["third-party-attribution"],
+			"acknowledgement": {
+				"at": "2026-08-25T17:55:08.475Z",
+				"reason": "Implemented the user-approved provider scope change: removed OpenCode Go, documented Codex 5-hour plus weekly windows, and expanded Copilot passive limit details without probes. Reviewed package boundary and retained only applicable attribution. Full verification and authenticated smoke passed."
+			}
 		}
 	]
 }

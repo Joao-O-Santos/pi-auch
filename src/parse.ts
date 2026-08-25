@@ -1,4 +1,4 @@
-import { type ProviderId, QUOTA_WINDOWS, type QuotaMetric, type QuotaResult } from "./types.js";
+import type { ProviderId, QuotaMetric, QuotaResult } from "./types.js";
 
 type RecordValue = Record<string, unknown>;
 
@@ -18,12 +18,12 @@ function percent(value: unknown): number | undefined {
 }
 
 function timestamp(value: unknown): number | undefined {
-	if (typeof value === "number" && Number.isFinite(value)) {
+	if (typeof value === "number" && Number.isFinite(value) && value > 0) {
 		return value < 10_000_000_000 ? value * 1000 : value;
 	}
 	if (typeof value === "string") {
 		const parsed = Date.parse(value);
-		return Number.isFinite(parsed) ? parsed : undefined;
+		return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 	}
 	return undefined;
 }
@@ -38,64 +38,42 @@ function result(provider: ProviderId, metrics: QuotaMetric[], plan?: unknown): Q
 	};
 }
 
+function codexLabel(window: RecordValue, fallback: "5h" | "weekly"): "5h" | "weekly" {
+	const seconds = finite(window.limit_window_seconds);
+	if (seconds === 18_000) return "5h";
+	if (seconds === 604_800) return "weekly";
+	return fallback;
+}
+
+function codexMetric(
+	window: RecordValue | undefined,
+	fallback: "5h" | "weekly",
+): QuotaMetric | undefined {
+	if (!window) return undefined;
+	const usedPercent = percent(window.used_percent);
+	if (usedPercent === undefined) return undefined;
+	const absoluteReset = timestamp(window.reset_at);
+	const resetAfter = finite(window.reset_after_seconds);
+	const resetAt =
+		absoluteReset ??
+		(resetAfter !== undefined ? Date.now() + Math.max(0, resetAfter) * 1000 : undefined);
+	return {
+		label: codexLabel(window, fallback),
+		usedPercent,
+		...(resetAt !== undefined ? { resetAt } : {}),
+	};
+}
+
 export function parseCodexUsage(value: unknown): QuotaResult {
 	const root = record(value);
 	const rateLimit = record(root?.rate_limit);
 	if (!root || !rateLimit) throw new Error("invalid Codex usage response");
 
-	const metrics: QuotaMetric[] = [];
-	const window = record(rateLimit.secondary_window) ?? record(rateLimit.primary_window);
-	const usedPercent = percent(window?.used_percent);
-	if (usedPercent !== undefined) {
-		const resetAt = timestamp(window?.reset_at);
-		metrics.push({
-			label: "weekly",
-			usedPercent,
-			...(resetAt !== undefined ? { resetAt } : {}),
-		});
-	}
+	const primary = record(rateLimit.primary_window);
+	const secondary = record(rateLimit.secondary_window);
+	const metrics = [
+		codexMetric(primary, secondary ? "5h" : "weekly"),
+		codexMetric(secondary, "weekly"),
+	].filter((metric): metric is QuotaMetric => metric !== undefined);
 	return result("openai-codex", metrics, root.plan_type);
-}
-
-function decodeEntities(text: string): string {
-	return text
-		.replaceAll(/&nbsp;|&#160;/gi, " ")
-		.replaceAll(/&amp;/gi, "&")
-		.replaceAll(/&lt;/gi, "<")
-		.replaceAll(/&gt;/gi, ">");
-}
-
-export function parseOpenCodeUsage(html: string): QuotaResult {
-	const metrics: QuotaMetric[] = [];
-	for (const label of QUOTA_WINDOWS) {
-		const embedded = new RegExp(`${label}Usage:\\$R\\[\\d+\\]=\\{([^}]*)\\}`).exec(html)?.[1];
-		const usage = embedded ? /usagePercent:(\d+(?:\.\d+)?)/.exec(embedded)?.[1] : undefined;
-		if (!usage) continue;
-		const usedPercent = Number(usage);
-		if (usedPercent < 0 || usedPercent > 100) continue;
-		const reset = /resetInSec:(\d+(?:\.\d+)?)/.exec(embedded ?? "")?.[1];
-		metrics.push({
-			label,
-			usedPercent,
-			...(reset ? { resetAt: Date.now() + Number(reset) * 1000 } : {}),
-		});
-	}
-
-	const text = decodeEntities(
-		html
-			.replaceAll(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-			.replaceAll(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-			.replaceAll(/<[^>]+>/g, " "),
-	).replaceAll(/\s+/g, " ");
-
-	for (const label of QUOTA_WINDOWS) {
-		if (metrics.some((metric) => metric.label === label)) continue;
-		const match = text.match(
-			new RegExp(`\\b${label}\\b[^%]{0,100}?((?:100|\\d{1,2})(?:\\.\\d+)?)\\s*%`, "i"),
-		);
-		if (!match?.[1]) continue;
-		const usedPercent = Number(match[1]);
-		if (usedPercent >= 0 && usedPercent <= 100) metrics.push({ label, usedPercent });
-	}
-	return result("opencode-go", metrics);
 }

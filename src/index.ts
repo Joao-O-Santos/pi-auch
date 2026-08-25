@@ -1,6 +1,6 @@
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { QuotaCache } from "./cache.js";
-import { parseCopilotHeaders, parseOpenCodeGoHeaders } from "./passive.js";
+import { parseCopilotHeaders } from "./passive.js";
 import { createReaders, type ProviderAuth } from "./readers.js";
 import { formatConfiguredFooter, formatDetail } from "./render.js";
 import { PROVIDERS, type ProviderId, type QuotaResult } from "./types.js";
@@ -12,8 +12,20 @@ const PASSIVE_PARSERS: Partial<
 	Record<ProviderId, (headers: Record<string, string>, status: number) => QuotaResult | undefined>
 > = {
 	"github-copilot": parseCopilotHeaders,
-	"opencode-go": parseOpenCodeGoHeaders,
 };
+
+function mergePassive(previous: QuotaResult | undefined, current: QuotaResult): QuotaResult {
+	if (!previous || current.metrics.some((metric) => metric.label === "rate limited"))
+		return current;
+	const currentLabels = new Set(current.metrics.map((metric) => metric.label));
+	return {
+		...current,
+		metrics: [
+			...current.metrics,
+			...previous.metrics.filter((metric) => !currentLabels.has(metric.label)),
+		],
+	};
+}
 
 export default function piAuch(pi: ExtensionAPI) {
 	let resolveAuth: (provider: string) => Promise<ProviderAuth | undefined> = async () => undefined;
@@ -62,8 +74,9 @@ export default function piAuch(pi: ExtensionAPI) {
 	pi.on("session_shutdown", (_event, ctx) => shutdown(ctx));
 	pi.on("after_provider_response", (event, ctx) => {
 		const provider = ctx.model?.provider as ProviderId | undefined;
-		const value = provider && PASSIVE_PARSERS[provider]?.(event.headers, event.status);
-		if (!value) return;
+		const parsed = provider && PASSIVE_PARSERS[provider]?.(event.headers, event.status);
+		if (!parsed) return;
+		const value = mergePassive(passive.get(parsed.provider), parsed);
 		passive.set(value.provider, value);
 		cache.store(value);
 		if (running) render(ctx);

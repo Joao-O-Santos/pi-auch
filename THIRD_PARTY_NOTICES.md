@@ -1,6 +1,6 @@
 # Third-party notices
 
-Parts of the OpenCode Go dashboard parser/configuration design and passive provider-header parsing were adapted from [`@mtrojnar/pi-usage`](https://github.com/mtrojnar/pi-usage) at commit `8ea39c7cf4338073cbd816570b044bc9d675175c`.
+Parts of the passive provider-header parsing were adapted from [`@mtrojnar/pi-usage`](https://github.com/mtrojnar/pi-usage) at commit `8ea39c7cf4338073cbd816570b044bc9d675175c`.
 
 ## pi-usage
 

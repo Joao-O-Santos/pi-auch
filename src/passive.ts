@@ -1,6 +1,6 @@
-import { type ProviderId, QUOTA_WINDOWS, type QuotaMetric, type QuotaResult } from "./types.js";
+import type { ProviderId, QuotaMetric, QuotaResult } from "./types.js";
 
-// Header families and quota-window conventions adapted from pi-usage (MIT); see THIRD_PARTY_NOTICES.md.
+// Header conventions adapted from pi-usage (MIT); see THIRD_PARTY_NOTICES.md.
 
 function header(headers: Record<string, string>, name: string): string | undefined {
 	const target = name.toLowerCase();
@@ -35,15 +35,21 @@ function metric(
 	prefix: string,
 	label: string,
 ): QuotaMetric | undefined {
-	const limit = number(headers, `${prefix}-limit`);
-	const remaining = number(headers, `${prefix}-remaining`);
-	const used = number(headers, `${prefix}-used`);
+	const rawLimit = number(headers, `${prefix}-limit`);
+	const rawRemaining = number(headers, `${prefix}-remaining`);
+	const rawUsed = number(headers, `${prefix}-used`);
+	const limit = rawLimit !== undefined && rawLimit >= 0 ? rawLimit : undefined;
+	const remaining = rawRemaining !== undefined && rawRemaining >= 0 ? rawRemaining : undefined;
+	const used = rawUsed !== undefined && rawUsed >= 0 ? rawUsed : undefined;
 	const explicitPercent = number(headers, `${prefix}-used-percent`, `${prefix}-usage-percent`);
+	const remainingPercent = number(headers, `${prefix}-remaining-percent`);
 	const usedPercent =
 		explicitPercent ??
-		(limit !== undefined && limit > 0 && (used !== undefined || remaining !== undefined)
-			? ((used ?? limit - (remaining ?? limit)) / limit) * 100
-			: undefined);
+		(remainingPercent !== undefined
+			? 100 - remainingPercent
+			: limit !== undefined && limit > 0 && (used !== undefined || remaining !== undefined)
+				? ((used ?? limit - (remaining ?? limit)) / limit) * 100
+				: undefined);
 	const reset = resetAt(headers, prefix);
 	if (
 		limit === undefined &&
@@ -81,30 +87,11 @@ export function parseCopilotHeaders(
 	headers: Record<string, string>,
 	status: number,
 ): QuotaResult | undefined {
-	const premium = metric(headers, "x-copilot-premium-requests", "premium requests");
-	if (premium) return result("github-copilot", [premium]);
+	const metrics = [
+		metric(headers, "x-copilot-premium-requests", "premium"),
+		metric(headers, "x-ratelimit", "requests"),
+	].filter((value): value is QuotaMetric => value !== undefined);
+	if (metrics.length > 0) return result("github-copilot", metrics);
 	if (status === 429) return rateLimited(headers, "github-copilot");
-	return undefined;
-}
-
-function goMetric(headers: Record<string, string>, window: string): QuotaMetric | undefined {
-	for (const prefix of ["x-opencode-go", "x-opencode"]) {
-		const value =
-			metric(headers, `${prefix}-${window}`, window) ??
-			metric(headers, `${prefix}-quota-${window}`, window);
-		if (value) return value;
-	}
-	return undefined;
-}
-
-export function parseOpenCodeGoHeaders(
-	headers: Record<string, string>,
-	status: number,
-): QuotaResult | undefined {
-	const metrics = QUOTA_WINDOWS.map((window) => goMetric(headers, window)).filter(
-		(value): value is QuotaMetric => value !== undefined,
-	);
-	if (metrics.length > 0) return result("opencode-go", metrics);
-	if (status === 429) return rateLimited(headers, "opencode-go");
 	return undefined;
 }

@@ -3,14 +3,13 @@
 ## Objective
 
 - {accepted} Provide quota visibility primarily through Pi's existing footer.
-- {accepted} Support OpenAI Codex, GitHub Copilot, and OpenCode Go.
+- {accepted} Support OpenAI Codex and GitHub Copilot.
 - {accepted} Keep the extension small, direct, and easy to review.
 
 ## Current direction
 
-- {accepted} Report Codex weekly quota from the available Codex rate-limit window and include days until reset.
-- {accepted} Report Copilot premium-request quota passively after normal provider use.
-- {accepted} Report OpenCode Go daily, weekly, and monthly quota from its dashboard or passive headers.
+- {accepted} Report Codex 5-hour and weekly rolling quotas with time until each reset.
+- {accepted} Report Copilot premium-request and generic request limits passively after normal provider use, including counts, percentages, and reset times when exposed.
 - {accepted} Keep single-metric footer output compact and retain labels for multi-window providers.
 
 ## Audience
@@ -22,7 +21,6 @@
 - {accepted} Use real quota sources rather than spending quota on model probes:
   - Codex: ChatGPT `wham/usage`.
   - GitHub Copilot: passive quota/rate-limit headers from normal session use.
-  - OpenCode Go: authenticated workspace dashboard usage, with passive headers when available.
 - {accepted} Show compact usage for every configured provider in Pi's standard footer via `ctx.ui.setStatus()`.
 - {provisional} Keep `/auch` as a secondary command for explicit refresh and provider details.
 
@@ -39,7 +37,6 @@
 - {accepted} Do not use model probes.
 - {accepted} Leave the adjacent `pi-sych` repository unchanged.
 - {inferred} Bound network requests and response sizes, retain stale successful data on transient failures, and avoid overlapping refreshes.
-- {accepted} Permit an explicitly configured OpenCode Go browser cookie through environment variables or a private config file; require private file permissions on POSIX systems.
 
 ## Definition of done
 
@@ -52,14 +49,14 @@
 
 ## Previous action
 
-- Released and tagged `v0.1.6` after the GitLab `check` job passed; it fixes primary-only Codex quota responses, adds reset-day rendering, and adds opt-in authenticated smoke checks.
-- Identified that some Codex accounts expose their weekly quota as the sole `primary_window`; implemented and verified a fallback plus reset-day rendering locally.
-- Added an opt-in developer smoke test that uses Pi-resolved authentication without model probes; the local run confirmed live Codex quota and reset data plus configured Copilot and Go subscriptions.
+- Confirmed from a redacted live quota read that Codex identifies its 5-hour and weekly windows with `limit_window_seconds`; no credential or response body was logged.
+- Removed OpenCode Go because its available sources did not report trustworthy subscription limits.
+- Kept Copilot passive-only and expanded recognized details without adding a model probe.
 
 ## Immediate next step
 
-- Monitor `v0.1.6` installation and confirm the corrected Codex footer in normal Pi use.
+- Monitor the `v0.1.7-rc0` candidate and test its two-window Codex footer in normal Pi use before a stable release.
 
 ## Unresolved
 
-- {unresolved} Whether to publish publicly; implementation and local installation do not imply publication.
+- {unresolved} Whether normal Copilot responses expose detailed quota headers consistently enough to provide more than configured status.

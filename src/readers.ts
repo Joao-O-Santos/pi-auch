@@ -1,10 +1,8 @@
-import { getOpenCodeGoConfig } from "./config.js";
 import { boundedFetch } from "./http.js";
-import { parseCodexUsage, parseOpenCodeUsage } from "./parse.js";
+import { parseCodexUsage } from "./parse.js";
 import type { ProviderId, ProviderReader, QuotaResult } from "./types.js";
 
 const USER_AGENT = "pi-auch/0.1";
-const OPENCODE_USAGE_URL = "https://opencode.ai/workspace";
 
 export interface ProviderAuth {
 	apiKey?: string;
@@ -73,29 +71,6 @@ export function createReaders(
 			async read() {
 				token(await resolveAuth("github-copilot"), "Copilot");
 				return passiveOrConfigured(readPassive, "github-copilot");
-			},
-		},
-		{
-			id: "opencode-go",
-			async read(signal) {
-				token(await resolveAuth("opencode-go"), "OpenCode Go");
-				const state = getOpenCodeGoConfig();
-				if ("error" in state) throw new Error(state.error);
-				if (!("config" in state)) return passiveOrConfigured(readPassive, "opencode-go");
-				const html = await boundedFetch(
-					`${OPENCODE_USAGE_URL}/${encodeURIComponent(state.config.workspaceId)}/go`,
-					{
-						expectedType: "html",
-						allowSameOriginRedirects: true,
-						signal,
-						headers: {
-							Accept: "text/html",
-							Cookie: `auth=${state.config.authCookie}`,
-							"User-Agent": USER_AGENT,
-						},
-					},
-				);
-				return parseOpenCodeUsage(html as string);
 			},
 		},
 	];
