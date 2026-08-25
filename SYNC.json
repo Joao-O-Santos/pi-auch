@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-08-25T17:57:39.543Z",
+	"confirmedAt": "2026-08-25T18:06:43.301Z",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:a09339edc3581a9414ffbee3eae76053bbc5e3cf491d5da01f97acd75a81e16e",
+			"fingerprint": "sha256:5776645d691811d571326a394b6875ed260cc17a1bb03a916f156d470b152b0c",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-08-25T17:57:39.543Z",
-				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
+				"at": "2026-08-25T18:06:43.301Z",
+				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
 			}
 		},
 		{
@@ -21,19 +21,19 @@
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-08-25T17:57:39.543Z",
-				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
+				"at": "2026-08-25T18:06:43.301Z",
+				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
 			}
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:984a2ca953da927acfe6bc5f9177403aea4b7646a9a8cb606d45b94ada3237d4",
+			"fingerprint": "sha256:bac0ddae30f345702044b1b35325b61a7fff3d78355a27435d3905875ef2806b",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-08-25T17:57:39.543Z",
-				"reason": "Prepared version 0.1.7-rc0 after full verification, 100% line/function coverage, independent review fixes, and authenticated Codex/Copilot smoke checks. README remains accurate; RC monitoring is the next step."
+				"at": "2026-08-25T18:06:43.301Z",
+				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
 			}
 		},
 		{
