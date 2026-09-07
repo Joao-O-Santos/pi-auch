@@ -100,6 +100,12 @@ test("extension follows the complete session, model, command, and shutdown lifec
 		context,
 	);
 	assert.match(statuses.at(-1) ?? "", /GH 😭 AUCH!! 429\/1m/);
+	await handlers.get("after_provider_response")?.(
+		{ status: 200, headers: { "x-copilot-premium-requests-used-percent": "30" } },
+		context,
+	);
+	assert.match(statuses.at(-1) ?? "", /GH 🙂 nice 30%/);
+	assert.doesNotMatch(statuses.at(-1) ?? "", /429/);
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
 	context.model = { provider: "openai-codex" } as typeof context.model;
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
@@ -110,4 +116,61 @@ test("extension follows the complete session, model, command, and shutdown lifec
 
 	await shutdown({ status: 0, headers: {} }, context);
 	assert.equal(statuses.at(-1), undefined);
+});
+
+test("ended sessions cannot render after a later session starts", async (t) => {
+	const handlers = new Map<string, Handler>();
+	const intervalCallbacks: Array<() => void> = [];
+	const originalSetInterval = globalThis.setInterval;
+	globalThis.setInterval = ((callback: () => void) => {
+		intervalCallbacks.push(callback);
+		return { unref() {} };
+	}) as unknown as typeof setInterval;
+	t.after(() => {
+		globalThis.setInterval = originalSetInterval;
+	});
+
+	const pi = {
+		on(name: string, handler: Handler) {
+			handlers.set(name, handler);
+		},
+		registerCommand() {},
+	} as unknown as ExtensionAPI;
+	let releaseOldAuth: () => void = () => {};
+	const oldAuth = new Promise<void>((resolve) => {
+		releaseOldAuth = resolve;
+	});
+	const makeContext = (statuses: Array<string | undefined>, waitForAuth: boolean) =>
+		({
+			model: { provider: "github-copilot" },
+			modelRegistry: {
+				async getProviderAuth(provider: string) {
+					if (waitForAuth && provider === "github-copilot") await oldAuth;
+					return provider === "github-copilot" ? { auth: { apiKey: "resolved" } } : undefined;
+				},
+			},
+			ui: {
+				setStatus(_key: string, value: string | undefined) {
+					statuses.push(value);
+				},
+			},
+		}) as unknown as ExtensionContext;
+	const oldStatuses: Array<string | undefined> = [];
+	const newStatuses: Array<string | undefined> = [];
+	const oldContext = makeContext(oldStatuses, true);
+	const newContext = makeContext(newStatuses, false);
+
+	piAuch(pi);
+	await handlers.get("session_start")?.({ status: 0, headers: {} }, oldContext);
+	const oldInterval = intervalCallbacks[0];
+	await handlers.get("session_shutdown")?.({ status: 0, headers: {} }, oldContext);
+	await handlers.get("session_start")?.({ status: 0, headers: {} }, newContext);
+	await new Promise((resolve) => setImmediate(resolve));
+	assert.match(newStatuses.at(-1) ?? "", /GH configured/);
+
+	const oldRenderCount = oldStatuses.length;
+	oldInterval?.();
+	releaseOldAuth();
+	await new Promise((resolve) => setImmediate(resolve));
+	assert.equal(oldStatuses.length, oldRenderCount);
 });

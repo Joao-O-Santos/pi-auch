@@ -26,7 +26,9 @@ function mergePassive(previous: QuotaResult | undefined, current: QuotaResult): 
 		...current,
 		metrics: [
 			...current.metrics,
-			...previous.metrics.filter((metric) => !currentLabels.has(metric.label)),
+			...previous.metrics.filter(
+				(metric) => metric.label !== "rate limited" && !currentLabels.has(metric.label),
+			),
 		],
 	};
 }
@@ -42,6 +44,7 @@ export default function piAuch(pi: ExtensionAPI) {
 	);
 	let timer: ReturnType<typeof setInterval> | undefined;
 	let running = false;
+	let sessionGeneration = 0;
 
 	const render = (ctx: ExtensionContext) => {
 		const states = new Map(
@@ -56,23 +59,26 @@ export default function piAuch(pi: ExtensionAPI) {
 		);
 	};
 
-	const refresh = async (ctx: ExtensionContext) => {
+	const refresh = async (ctx: ExtensionContext, generation: number) => {
 		await cache.refreshAll();
-		if (running) render(ctx);
+		if (running && generation === sessionGeneration) render(ctx);
 	};
 
 	pi.on("session_start", async (_event, ctx) => {
+		if (timer) clearInterval(timer);
+		cache.abort();
+		const generation = ++sessionGeneration;
 		running = true;
 		resolveAuth = async (provider) => (await ctx.modelRegistry.getProviderAuth(provider))?.auth;
 		render(ctx);
-		void refresh(ctx);
-		if (timer) clearInterval(timer);
-		timer = setInterval(() => void refresh(ctx), REFRESH_MS);
+		void refresh(ctx, generation);
+		timer = setInterval(() => void refresh(ctx, generation), REFRESH_MS);
 		timer.unref?.();
 	});
 
 	const shutdown = (ctx: ExtensionContext) => {
 		running = false;
+		sessionGeneration++;
 		if (timer) clearInterval(timer);
 		timer = undefined;
 		cache.abort();
@@ -91,8 +97,9 @@ export default function piAuch(pi: ExtensionAPI) {
 	pi.registerCommand("auch", {
 		description: "Refresh and show quota details for configured providers",
 		handler: async (_args, ctx) => {
+			const generation = sessionGeneration;
 			const states = await cache.refreshAll();
-			if (running) render(ctx);
+			if (running && generation === sessionGeneration) render(ctx);
 			const lines = PROVIDERS.map((provider) => {
 				const state = states.get(provider);
 				return state ? formatDetail(provider, state, getColorize(ctx)) : `${provider}: unavailable`;
