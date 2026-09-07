@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T21:52:23+01:00",
+	"confirmedAt": "2026-09-07T21:53:40+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:f09f2e17201b93a117afaa86e44f821294db6b10fa28b368fbdcb4cb55700797",
+			"fingerprint": "sha256:9dabdc2e6755aa8d3b6f9997c17aab0bfc5dca7e71d730c0e9a5bc9435c196cf",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T16:55:15+01:00",
-				"reason": "Recorded the v0.2.0 feature release after concise quota reactions, a 5-minute refresh interval, and local verification passed."
+				"at": "2026-09-07T21:53:40+01:00",
+				"reason": "Recorded the prepared v0.2.1 patch release for the optimized logo documentation change."
 			}
 		},
 		{
@@ -27,13 +27,13 @@
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:68ccdcfa696b685b9428face4f7ce5fd8a425411e03f489040affbc17912d8ba",
+			"fingerprint": "sha256:be448edb2a94b7aa3e2aae6660cfd4e58a23f7785921ca82974b926be0884f85",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-09-07T21:46:06+01:00",
-				"reason": "Included logo.png in the published package so the README image renders from npm installations."
+				"at": "2026-09-07T21:53:40+01:00",
+				"reason": "Prepared v0.2.1 and kept logo.png in the published package so the README image renders from npm installations."
 			}
 		},
 		{

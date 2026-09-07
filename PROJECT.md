@@ -55,11 +55,12 @@
 - Removed OpenCode Go because its available sources did not report trustworthy subscription limits.
 - Kept Copilot passive-only and expanded recognized details without adding a model probe.
 - Implemented concise quota reactions and a 5-minute refresh interval; local release checks pass with 27 tests and 100% line/function coverage.
-- Promoted the feature bump to `v0.2.0` after verification.
+- Added the optimized project logo to the README and published package boundary.
+- Prepared the patch release `v0.2.1`; the package includes the self-contained 480px logo asset.
 
 ## Immediate next step
 
-- Monitor `v0.2.0` installation and its reactive two-window Codex footer in normal Pi use.
+- Run branch CI for `v0.2.1`; if it passes, tag and monitor the release pipeline.
 
 ## Unresolved
 
