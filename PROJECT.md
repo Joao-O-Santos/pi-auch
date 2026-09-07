@@ -57,7 +57,7 @@
 - Implemented concise quota reactions and a 5-minute refresh interval; local release checks pass with 27 tests and 100% line/function coverage.
 - Added the optimized project logo to the README and published package boundary.
 - Promoted the patch release `v0.2.1`; branch and tag CI/CD passed, including npm publication.
-- The package includes the self-contained optimized 480px logo asset.
+- The package includes the self-contained original-resolution logo asset.
 
 ## Immediate next step
 

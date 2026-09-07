@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T21:59:31+01:00",
+	"confirmedAt": "2026-09-07T22:15:05+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:1d850fae0abeb623130ed7bc6dd68b27c9a67afcc6b7ca50625a663b319cac42",
+			"fingerprint": "sha256:46e4e75a1c399b5a15f593107b93aac24d93b36d8413c4902668c92b552fd1b4",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T21:59:31+01:00",
-				"reason": "Recorded the completed v0.2.1 patch release after branch and tag CI/CD passed, including npm publication."
+				"at": "2026-09-07T22:15:05+01:00",
+				"reason": "Restored the exact original-resolution logo while retaining the completed v0.2.1 release record."
 			}
 		},
 		{
@@ -38,13 +38,13 @@
 		},
 		{
 			"path": "logo.png",
-			"fingerprint": "sha256:5939c18d63d6511c8b2b2cdc7c3ad9a109bcac29f2f36dc41fe136003c3af4b3",
+			"fingerprint": "sha256:d7709bf5d224d56800cb05c8d47b96ea8fdc061ba4fbe69ce5e34b5f568555c4",
 			"status": "current",
 			"role": "package-asset",
 			"authoritativeFor": ["project-logo"],
 			"acknowledgement": {
-				"at": "2026-09-07T21:52:23+01:00",
-				"reason": "Added as the README and published package logo asset; optimized to 480px for a smaller self-contained package."
+				"at": "2026-09-07T22:15:05+01:00",
+				"reason": "Restored the exact original-resolution logo after an unintended image optimization."
 			}
 		},
 		{
