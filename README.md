@@ -23,7 +23,7 @@ To try it for one session without installing it:
 pi -e npm:pi-auch
 ```
 
-Usage for every configured provider is shown in Pi's existing footer. Run `/auch` to refresh and display full provider details.
+Usage appears compactly in Pi's footer as provider, emoji, pain reaction, percentage, and reset time: `Cdx 🙂 nice 12%/4h - 😬 ohhh 55%/3d`. Reactions escalate from `nice` to `ohhh`, `auch!`, and `AUCH!!`; Codex weights the 5-hour and weekly reset windows separately. Run `/auch` for full details.
 
 ## Authentication
 
@@ -34,7 +34,7 @@ pi-auch never opens Pi's credential files, stores provider credentials, logs cre
 
 ## Behavior
 
-Quota is fetched at session start, every 15 minutes, and on `/auch`. Passive provider data updates after normal model responses. Requests have deadlines and body-size limits. Concurrent refreshes are deduplicated. A transient failure keeps the last successful value marked as stale.
+Quota is fetched at session start, every 5 minutes, and on `/auch`. Passive provider data updates after normal model responses. Requests have deadlines and body-size limits. Concurrent refreshes are deduplicated. A transient failure keeps the last successful value marked as stale.
 
 The passive quota-header conventions are adapted from MIT-licensed [`@mtrojnar/pi-usage`](https://github.com/mtrojnar/pi-usage); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

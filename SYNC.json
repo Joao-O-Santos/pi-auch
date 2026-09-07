@@ -1,28 +1,28 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-08-25T18:06:43.301Z",
+	"confirmedAt": "2026-09-07T16:24:25+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:5776645d691811d571326a394b6875ed260cc17a1bb03a916f156d470b152b0c",
+			"fingerprint": "sha256:cb1e7e22ef10ca8036888ee6578897d0d435c44c21e4118bed3fa5b70963fc42",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-08-25T18:06:43.301Z",
-				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
+				"at": "2026-09-07T16:24:25+01:00",
+				"reason": "Refined dependency-free footer reactions to concise emoji-first Cdx output with AUCH!! at the highest level; verification passes: 27 tests, 100% line/function coverage, 97.05% branch coverage, and authenticated smoke."
 			}
 		},
 		{
 			"path": "README.md",
-			"fingerprint": "sha256:ee9ca10b35b4fecfc6982b8cf83f97cd7d28016e4c7f5e9dc0327d8b3c571eb0",
+			"fingerprint": "sha256:fcdd4cb5a13d2827986c5b987124392f79c58fdcbde2209741a2ba17a8749f7a",
 			"status": "current",
 			"role": "documentation",
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-08-25T18:06:43.301Z",
-				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
+				"at": "2026-09-07T16:24:25+01:00",
+				"reason": "Refined dependency-free footer reactions to concise emoji-first Cdx output with AUCH!! at the highest level; verification passes: 27 tests, 100% line/function coverage, 97.05% branch coverage, and authenticated smoke."
 			}
 		},
 		{

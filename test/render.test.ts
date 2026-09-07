@@ -23,8 +23,8 @@ function ready(metrics: QuotaMetric[], stale = false): QuotaState {
 }
 
 test("renders loading, unavailable, and label-free single-metric footer states", () => {
-	assert.equal(formatFooter("github-copilot", undefined), "Copilot …");
-	assert.equal(formatFooter("github-copilot", unavailable), "Copilot unavailable");
+	assert.equal(formatFooter("github-copilot", undefined), "GH…");
+	assert.equal(formatFooter("github-copilot", unavailable), "GH—");
 	assert.equal(
 		formatFooter("openai-codex", {
 			status: "ready",
@@ -36,7 +36,7 @@ test("renders loading, unavailable, and label-free single-metric footer states",
 				metrics: [{ label: "weekly", usedPercent: 55 }],
 			},
 		}),
-		"Codex 55% (stale)",
+		"Cdx 😬 ohhh 55% ~",
 	);
 });
 
@@ -54,8 +54,15 @@ test("renders Codex 5h and weekly percentages with appropriate reset units", (t)
 			],
 		},
 	};
-	assert.equal(formatFooter("openai-codex", state), "Codex 5h 12%/4.5h · weekly 55%/2.5d");
-	assert.equal(formatDetail("openai-codex", state), "Codex: 5h 12%/4.5h · weekly 55%/2.5d");
+	assert.equal(formatFooter("openai-codex", state), "Cdx 🙂 nice 12%/5h - 😬 ohhh 55%/3d");
+	assert.equal(
+		formatDetail("openai-codex", state),
+		"Codex: 🙂 nice 5h 12%/4.5h · 😬 ohhh weekly 55%/2.5d",
+	);
+	assert.equal(
+		formatFooter("openai-codex", state, (color, text) => `[${color}:${text}]`),
+		"Cdx [success:🙂 nice] 12%/5h - [warning:😬 ohhh] 55%/3d",
+	);
 });
 
 test("formats all configured providers and omits missing credentials", () => {
@@ -63,7 +70,7 @@ test("formats all configured providers and omits missing credentials", () => {
 		["openai-codex", unavailable],
 		["github-copilot", ready([{ label: "chat", unlimited: true }])],
 	] as const);
-	assert.equal(formatConfiguredFooter(states), "Codex unavailable | Copilot ∞");
+	assert.equal(formatConfiguredFooter(states), "Cdx— | GH 🙂 nice ∞");
 	assert.equal(
 		formatConfiguredFooter(
 			new Map([
@@ -88,13 +95,34 @@ test("formats and prioritizes detailed Copilot metrics and reset units", (t) => 
 		{ label: "completions", usedPercent: 20 },
 		{ label: "unknown", resetAt: 1_000_000 + 30_000 },
 	]);
-	assert.equal(
-		formatFooter("github-copilot", state),
-		"Copilot premium interactions 8/10 left/3.0h · chat ∞",
-	);
+	assert.equal(formatFooter("github-copilot", state), "GH 🙂 nice 8/10/3h - 🙂 nice ∞");
 	assert.equal(
 		formatDetail("github-copilot", state),
-		"Copilot (pro): premium interactions 8/10 left/3.0h · chat ∞ · other 3 left/3m · completions 20% · unknown/30s",
+		"Copilot (pro): 🙂 nice premium interactions 8/10 left/3.0h · 🙂 nice chat ∞ · other 3 left/3m · 🙂 nice completions 20% · unknown/30s",
+	);
+});
+
+test("weights pain by quota use and time until the matching reset", (t) => {
+	t.mock.method(Date, "now", () => 1_000_000);
+	const state: QuotaState = {
+		status: "ready",
+		stale: false,
+		value: {
+			provider: "openai-codex",
+			fetchedAt: 1,
+			metrics: [
+				{ label: "5h", usedPercent: 49, resetAt: 1_000_000 + 5 * 3_600_000 },
+				{ label: "weekly", usedPercent: 49, resetAt: 1_000_000 + 7 * 86_400_000 },
+			],
+		},
+	};
+	assert.equal(formatFooter("openai-codex", state), "Cdx 😬 ohhh 49%/5h - 😬 ohhh 49%/7d");
+	assert.equal(
+		formatFooter("openai-codex", {
+			...state,
+			value: { ...state.value, metrics: [{ label: "5h", usedPercent: 95 }] },
+		}),
+		"Cdx 😭 AUCH!! 95%",
 	);
 });
 

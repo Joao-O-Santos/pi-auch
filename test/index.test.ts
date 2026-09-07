@@ -20,9 +20,11 @@ test("extension follows the complete session, model, command, and shutdown lifec
 	const statuses: Array<string | undefined> = [];
 	const notices: Notice[] = [];
 	let intervalCallback: (() => void) | undefined;
+	let intervalDelay: number | undefined;
 	const originalSetInterval = globalThis.setInterval;
-	globalThis.setInterval = ((callback: () => void) => {
+	globalThis.setInterval = ((callback: () => void, delay: number) => {
 		intervalCallback = callback;
+		intervalDelay = delay;
 		return { unref() {} };
 	}) as unknown as typeof setInterval;
 
@@ -43,6 +45,11 @@ test("extension follows the complete session, model, command, and shutdown lifec
 			},
 		},
 		ui: {
+			theme: {
+				fg(_color: string, text: string) {
+					return text;
+				},
+			},
 			setStatus(_key: string, value: string | undefined) {
 				statuses.push(value);
 			},
@@ -70,28 +77,29 @@ test("extension follows the complete session, model, command, and shutdown lifec
 
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
+	assert.equal(intervalDelay, 5 * 60 * 1000);
 	intervalCallback?.();
 	await new Promise((resolve) => setImmediate(resolve));
-	assert.match(statuses.at(-1) ?? "", /Copilot configured/);
+	assert.match(statuses.at(-1) ?? "", /GH configured/);
 
 	context.model = { provider: "github-copilot" } as typeof context.model;
 	await handlers.get("after_provider_response")?.(
 		{ status: 200, headers: { "x-copilot-premium-requests-used-percent": "25" } },
 		context,
 	);
-	assert.match(statuses.at(-1) ?? "", /Copilot 25%/);
+	assert.match(statuses.at(-1) ?? "", /GH 🙂 nice 25%/);
 	await handlers.get("after_provider_response")?.({ status: 200, headers: {} }, context);
-	assert.match(statuses.at(-1) ?? "", /Copilot 25%/);
+	assert.match(statuses.at(-1) ?? "", /GH 🙂 nice 25%/);
 	await handlers.get("after_provider_response")?.(
 		{ status: 200, headers: { "x-ratelimit-used-percent": "10" } },
 		context,
 	);
-	assert.match(statuses.at(-1) ?? "", /Copilot premium 25% · requests 10%/);
+	assert.match(statuses.at(-1) ?? "", /GH 🙂 nice 25% - 🙂 nice 10%/);
 	await handlers.get("after_provider_response")?.(
 		{ status: 429, headers: { "retry-after": "2" } },
 		context,
 	);
-	assert.match(statuses.at(-1) ?? "", /Copilot rate limited/);
+	assert.match(statuses.at(-1) ?? "", /GH 😭 AUCH!! 429\/1m/);
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);
 	context.model = { provider: "openai-codex" } as typeof context.model;
 	await handlers.get("after_provider_response")?.({ status: 500, headers: {} }, context);

@@ -2,17 +2,21 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import { QuotaCache } from "./cache.js";
 import { parseCopilotHeaders } from "./passive.js";
 import { createReaders, type ProviderAuth } from "./readers.js";
-import { formatConfiguredFooter, formatDetail } from "./render.js";
+import { type Colorize, formatConfiguredFooter, formatDetail } from "./render.js";
 import { PROVIDERS, type ProviderId, type QuotaResult } from "./types.js";
 
 const STATUS_KEY = "pi-auch";
-const REFRESH_MS = 15 * 60 * 1000;
+const REFRESH_MS = 5 * 60 * 1000;
 
 const PASSIVE_PARSERS: Partial<
 	Record<ProviderId, (headers: Record<string, string>, status: number) => QuotaResult | undefined>
 > = {
 	"github-copilot": parseCopilotHeaders,
 };
+
+function getColorize(ctx: ExtensionContext): Colorize | undefined {
+	return ctx.ui.theme?.fg ? (color, text) => ctx.ui.theme.fg(color, text) : undefined;
+}
 
 function mergePassive(previous: QuotaResult | undefined, current: QuotaResult): QuotaResult {
 	if (!previous || current.metrics.some((metric) => metric.label === "rate limited"))
@@ -46,7 +50,10 @@ export default function piAuch(pi: ExtensionAPI) {
 				return state ? [[provider, state] as const] : [];
 			}),
 		);
-		ctx.ui.setStatus(STATUS_KEY, running ? formatConfiguredFooter(states) : undefined);
+		ctx.ui.setStatus(
+			STATUS_KEY,
+			running ? formatConfiguredFooter(states, getColorize(ctx)) : undefined,
+		);
 	};
 
 	const refresh = async (ctx: ExtensionContext) => {
@@ -88,7 +95,7 @@ export default function piAuch(pi: ExtensionAPI) {
 			if (running) render(ctx);
 			const lines = PROVIDERS.map((provider) => {
 				const state = states.get(provider);
-				return state ? formatDetail(provider, state) : `${provider}: unavailable`;
+				return state ? formatDetail(provider, state, getColorize(ctx)) : `${provider}: unavailable`;
 			});
 			ctx.ui.notify(
 				lines.join("\n"),

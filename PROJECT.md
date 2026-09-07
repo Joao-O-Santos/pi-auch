@@ -11,6 +11,8 @@
 - {accepted} Report Codex 5-hour and weekly rolling quotas with time until each reset.
 - {accepted} Report Copilot premium-request and generic request limits passively after normal provider use, including counts, percentages, and reset times when exposed.
 - {accepted} Keep single-metric footer output compact and retain labels for multi-window providers.
+- {accepted} Add compact emoji/color `nice`/`ohhh`/`auch!`/`AUCH!!` reactions, weighting Codex 5-hour and weekly reset time separately.
+- {accepted} Refresh quota on session start, `/auch`, and a 5-minute interval.
 
 ## Audience
 
