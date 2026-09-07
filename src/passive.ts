@@ -2,12 +2,22 @@ import type { ProviderId, QuotaMetric, QuotaResult } from "./types.js";
 
 // Header conventions adapted from pi-usage (MIT); see THIRD_PARTY_NOTICES.md.
 
-function header(headers: Record<string, string>, name: string): string | undefined {
-	const target = name.toLowerCase();
-	return Object.entries(headers).find(([key]) => key.toLowerCase() === target)?.[1];
+type HeaderLookup = Record<string, string>;
+
+function normalizeHeaders(headers: Record<string, string>): HeaderLookup {
+	const normalized: HeaderLookup = Object.create(null);
+	for (const [key, value] of Object.entries(headers)) {
+		const name = key.toLowerCase();
+		if (!Object.hasOwn(normalized, name)) normalized[name] = value;
+	}
+	return normalized;
 }
 
-function number(headers: Record<string, string>, ...names: string[]): number | undefined {
+function header(headers: HeaderLookup, name: string): string | undefined {
+	return headers[name.toLowerCase()];
+}
+
+function number(headers: HeaderLookup, ...names: string[]): number | undefined {
 	for (const name of names) {
 		const value = header(headers, name);
 		if (!value?.trim()) continue;
@@ -17,7 +27,7 @@ function number(headers: Record<string, string>, ...names: string[]): number | u
 	return undefined;
 }
 
-function resetAt(headers: Record<string, string>, prefix: string): number | undefined {
+function resetAt(headers: HeaderLookup, prefix: string, now: number): number | undefined {
 	const raw = header(headers, `${prefix}-reset-at`) ?? header(headers, `${prefix}-reset`);
 	if (raw) {
 		const numeric = Number(raw);
@@ -27,13 +37,14 @@ function resetAt(headers: Record<string, string>, prefix: string): number | unde
 		if (Number.isFinite(parsed)) return parsed;
 	}
 	const after = number(headers, `${prefix}-reset-after-seconds`, `${prefix}-reset-after`);
-	return after !== undefined ? Date.now() + Math.max(0, after) * 1000 : undefined;
+	return after !== undefined ? now + Math.max(0, after) * 1000 : undefined;
 }
 
 function metric(
-	headers: Record<string, string>,
+	headers: HeaderLookup,
 	prefix: string,
 	label: string,
+	now: number,
 ): QuotaMetric | undefined {
 	const rawLimit = number(headers, `${prefix}-limit`);
 	const rawRemaining = number(headers, `${prefix}-remaining`);
@@ -50,7 +61,7 @@ function metric(
 			: limit !== undefined && limit > 0 && (used !== undefined || remaining !== undefined)
 				? ((used ?? limit - (remaining ?? limit)) / limit) * 100
 				: undefined);
-	const reset = resetAt(headers, prefix);
+	const reset = resetAt(headers, prefix, now);
 	if (
 		limit === undefined &&
 		remaining === undefined &&
@@ -68,30 +79,36 @@ function metric(
 	};
 }
 
-function result(provider: ProviderId, metrics: QuotaMetric[]): QuotaResult {
-	return { provider, fetchedAt: Date.now(), metrics };
+function result(provider: ProviderId, metrics: QuotaMetric[], now: number): QuotaResult {
+	return { provider, fetchedAt: now, metrics };
 }
 
 /** Fallback signal for a rate-limited response with no recognized quota metrics. */
-function rateLimited(headers: Record<string, string>, provider: ProviderId): QuotaResult {
+function rateLimited(headers: HeaderLookup, provider: ProviderId, now: number): QuotaResult {
 	const retry = number(headers, "retry-after");
-	return result(provider, [
-		{
-			label: "rate limited",
-			...(retry !== undefined ? { resetAt: Date.now() + Math.max(0, retry) * 1000 } : {}),
-		},
-	]);
+	return result(
+		provider,
+		[
+			{
+				label: "rate limited",
+				...(retry !== undefined ? { resetAt: now + Math.max(0, retry) * 1000 } : {}),
+			},
+		],
+		now,
+	);
 }
 
 export function parseCopilotHeaders(
 	headers: Record<string, string>,
 	status: number,
 ): QuotaResult | undefined {
+	const normalized = normalizeHeaders(headers);
+	const now = Date.now();
 	const metrics = [
-		metric(headers, "x-copilot-premium-requests", "premium"),
-		metric(headers, "x-ratelimit", "requests"),
+		metric(normalized, "x-copilot-premium-requests", "premium", now),
+		metric(normalized, "x-ratelimit", "requests", now),
 	].filter((value): value is QuotaMetric => value !== undefined);
-	if (metrics.length > 0) return result("github-copilot", metrics);
-	if (status === 429) return rateLimited(headers, "github-copilot");
+	if (metrics.length > 0) return result("github-copilot", metrics, now);
+	if (status === 429) return rateLimited(normalized, "github-copilot", now);
 	return undefined;
 }

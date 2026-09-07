@@ -9,6 +9,7 @@ test("parses detailed Copilot premium and request limits case-insensitively", ()
 			"x-copilot-premium-requests-remaining": "75",
 			"x-copilot-premium-requests-reset-after": "60",
 			"X-RateLimit-Limit": "200",
+			"x-RATELIMIT-limit": "999",
 			"x-ratelimit-used": "50",
 			"x-ratelimit-reset": "1800000000",
 		},
@@ -30,7 +31,8 @@ test("parses detailed Copilot premium and request limits case-insensitively", ()
 	assert.equal(value?.metrics[1]?.resetAt, 1_800_000_000_000);
 });
 
-test("parses Copilot percentage variants, reset dates, and retry limits", () => {
+test("parses Copilot percentage variants, reset dates, and retry limits", (t) => {
+	t.mock.method(Date, "now", () => 1_000_000);
 	const dated = parseCopilotHeaders(
 		{
 			"x-copilot-premium-requests-usage-percent": "110",
@@ -42,14 +44,19 @@ test("parses Copilot percentage variants, reset dates, and retry limits", () => 
 	assert.equal(dated?.metrics[0]?.resetAt, Date.parse("2030-01-01T00:00:00Z"));
 
 	const remaining = parseCopilotHeaders(
-		{ "x-copilot-premium-requests-remaining-percent": "60" },
+		{
+			"x-copilot-premium-requests-remaining-percent": "60",
+			"x-copilot-premium-requests-reset-after-seconds": "30",
+		},
 		200,
 	);
 	assert.equal(remaining?.metrics[0]?.usedPercent, 40);
+	assert.equal(remaining?.metrics[0]?.resetAt, 1_030_000);
 
-	const limited = parseCopilotHeaders({ "retry-after": "2" }, 429);
+	const limited = parseCopilotHeaders({ "Retry-After": "2" }, 429);
 	assert.equal(limited?.metrics[0]?.label, "rate limited");
-	assert.ok((limited?.metrics[0]?.resetAt ?? 0) > Date.now());
+	assert.equal(limited?.metrics[0]?.resetAt, 1_002_000);
+	assert.equal(limited?.fetchedAt, 1_000_000);
 	assert.equal(parseCopilotHeaders({ "x-copilot-premium-requests-limit": " " }, 204), undefined);
 	assert.equal(
 		parseCopilotHeaders(
