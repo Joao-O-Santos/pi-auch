@@ -1,5 +1,9 @@
 # pi-auch
 
+<p align="center">
+  <img src="logo.png" alt="pi-auch logo" width="240">
+</p>
+
 [![pipeline
 status](https://gitlab.com/Joao-O-Santos/pi-auch/badges/main/pipeline.svg)](https://gitlab.com/Joao-O-Santos/pi-auch/-/commits/main)
 [![coverage](https://gitlab.com/Joao-O-Santos/pi-auch/badges/main/coverage.svg?job=check)](https://gitlab.com/Joao-O-Santos/pi-auch/-/pipelines)

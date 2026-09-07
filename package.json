@@ -19,6 +19,7 @@
 	"files": [
 		"src",
 		"README.md",
+		"logo.png",
 		"LICENSE",
 		"THIRD_PARTY_NOTICES.md"
 	],
