@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T22:26:30+01:00",
+	"confirmedAt": "2026-09-07T22:32:58+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:869412c8af159650f175c33d6ac7325f4201f66451ea9c8770ca5cf92108c1b5",
+			"fingerprint": "sha256:0ffc0b67389ba9cf0fb52fa8166cb1f62126cf6dc92bafc7734c81f816cb3096",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T22:26:30+01:00",
-				"reason": "Recorded the stronger-reviewed code fixes, exact logo restoration, and prepared v0.2.2 patch release."
+				"at": "2026-09-07T22:32:58+01:00",
+				"reason": "Recorded the completed v0.2.2 patch release after stronger-reviewed code fixes, exact logo restoration, and passing branch/tag CI/CD with npm publication."
 			}
 		},
 		{

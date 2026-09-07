@@ -59,11 +59,12 @@
 - Promoted the patch release `v0.2.1`; branch and tag CI/CD passed, including npm publication.
 - Restored the exact original-resolution logo asset.
 - Hardened refresh/session isolation, removed recovered Copilot rate-limit state, and normalized passive headers once per response after stronger review.
-- Prepared patch release `v0.2.2` with 29 passing tests.
+- Promoted patch release `v0.2.2`; branch and tag CI/CD passed, including npm publication.
+- The release contains the stronger-reviewed refresh/session fixes and the restored original-resolution logo.
 
 ## Immediate next step
 
-- Run branch CI for `v0.2.2`; if it passes, tag and monitor the release pipeline.
+- Monitor `v0.2.2` installation and its reactive two-window Codex footer in normal Pi use.
 
 ## Unresolved
 
