@@ -54,11 +54,12 @@
 - Confirmed from a redacted live quota read that Codex identifies its 5-hour and weekly windows with `limit_window_seconds`; no credential or response body was logged.
 - Removed OpenCode Go because its available sources did not report trustworthy subscription limits.
 - Kept Copilot passive-only and expanded recognized details without adding a model probe.
-- Tagged `v0.1.7-rc0` after local verification, authenticated smoke checks, and the GitLab `check` job passed.
+- Implemented concise quota reactions and a 5-minute refresh interval; local release checks pass with 27 tests and 100% line/function coverage.
+- Promoted the feature bump to `v0.2.0` after verification.
 
 ## Immediate next step
 
-- Monitor `v0.1.7` installation and its two-window Codex footer in normal Pi use.
+- Monitor `v0.2.0` installation and its reactive two-window Codex footer in normal Pi use.
 
 ## Unresolved
 

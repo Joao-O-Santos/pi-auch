@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T16:24:25+01:00",
+	"confirmedAt": "2026-09-07T16:55:15+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:cb1e7e22ef10ca8036888ee6578897d0d435c44c21e4118bed3fa5b70963fc42",
+			"fingerprint": "sha256:f09f2e17201b93a117afaa86e44f821294db6b10fa28b368fbdcb4cb55700797",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T16:24:25+01:00",
-				"reason": "Refined dependency-free footer reactions to concise emoji-first Cdx output with AUCH!! at the highest level; verification passes: 27 tests, 100% line/function coverage, 97.05% branch coverage, and authenticated smoke."
+				"at": "2026-09-07T16:55:15+01:00",
+				"reason": "Recorded the v0.2.0 feature release after concise quota reactions, a 5-minute refresh interval, and local verification passed."
 			}
 		},
 		{
@@ -27,13 +27,13 @@
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:bac0ddae30f345702044b1b35325b61a7fff3d78355a27435d3905875ef2806b",
+			"fingerprint": "sha256:c7777ea9712163463d8ff8dcda314720051725c9c2a4e0e5086439039b93342f",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-08-25T18:06:43.301Z",
-				"reason": "Promoting the verified v0.1.7-rc0 candidate to stable v0.1.7 at the user's explicit request. README remains accurate; project state records the passed RC pipeline and stable monitoring step."
+				"at": "2026-09-07T16:55:15+01:00",
+				"reason": "Recorded the v0.2.0 package version and release-state update; README remains accurate and local release checks pass."
 			}
 		},
 		{
