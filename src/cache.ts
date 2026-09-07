@@ -30,7 +30,7 @@ export class QuotaCache {
 
 		const controller = new AbortController();
 		this.controllers.add(controller);
-		const task = reader
+		const task: Promise<QuotaState> = reader
 			.read(controller.signal)
 			.then<QuotaState>((value) => ({ status: "ready", value, stale: false }))
 			.catch((error: unknown): QuotaState => {
@@ -46,11 +46,11 @@ export class QuotaCache {
 					: { status: "unavailable", error: message };
 			})
 			.then((state) => {
-				this.states.set(provider, state);
+				if (this.pending.get(provider) === task) this.states.set(provider, state);
 				return state;
 			})
 			.finally(() => {
-				this.pending.delete(provider);
+				if (this.pending.get(provider) === task) this.pending.delete(provider);
 				this.controllers.delete(controller);
 			});
 		this.pending.set(provider, task);
@@ -69,5 +69,6 @@ export class QuotaCache {
 	abort(): void {
 		for (const controller of this.controllers) controller.abort();
 		this.controllers.clear();
+		this.pending.clear();
 	}
 }

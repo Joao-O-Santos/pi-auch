@@ -44,6 +44,49 @@ test("deduplicates concurrent provider refreshes and refreshes all", async () =>
 	assert.equal((await cache.refreshAll()).get("openai-codex")?.status, "ready");
 });
 
+test("abort detaches work that ignores cancellation without corrupting a newer refresh", async () => {
+	for (const rejectOld of [false, true]) {
+		let calls = 0;
+		let settleOld: () => void = () => {};
+		let settleFresh: () => void = () => {};
+		const oldGate = new Promise<void>((resolve, reject) => {
+			settleOld = () => (rejectOld ? reject(new Error("late failure")) : resolve());
+		});
+		const freshGate = new Promise<void>((resolve) => {
+			settleFresh = resolve;
+		});
+		const cache = new QuotaCache([
+			{
+				id: "openai-codex",
+				async read() {
+					calls++;
+					await (calls === 1 ? oldGate : freshGate);
+					return { ...sample(), fetchedAt: calls };
+				},
+			},
+		]);
+
+		const old = cache.refresh("openai-codex");
+		await Promise.resolve();
+		cache.abort();
+		const fresh = cache.refresh("openai-codex");
+		await Promise.resolve();
+		assert.notStrictEqual(old, fresh);
+		assert.equal(calls, 2);
+
+		settleOld();
+		await old;
+		assert.strictEqual(cache.refresh("openai-codex"), fresh);
+		assert.equal(cache.get("openai-codex"), undefined);
+
+		settleFresh();
+		await fresh;
+		const state = cache.get("openai-codex");
+		assert.equal(state?.status, "ready");
+		if (state?.status === "ready") assert.equal(state.value.fetchedAt, 2);
+	}
+});
+
 test("retains successful data as stale after Error and unknown failures", async () => {
 	let failure: unknown;
 	const cache = new QuotaCache([
