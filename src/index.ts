@@ -99,7 +99,8 @@ export default function piAuch(pi: ExtensionAPI) {
 		handler: async (_args, ctx) => {
 			const generation = sessionGeneration;
 			const states = await cache.refreshAll();
-			if (running && generation === sessionGeneration) render(ctx);
+			if (generation !== sessionGeneration) return;
+			if (running) render(ctx);
 			const lines = PROVIDERS.map((provider) => {
 				const state = states.get(provider);
 				return state ? formatDetail(provider, state, getColorize(ctx)) : `${provider}: unavailable`;

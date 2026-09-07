@@ -118,8 +118,9 @@ test("extension follows the complete session, model, command, and shutdown lifec
 	assert.equal(statuses.at(-1), undefined);
 });
 
-test("ended sessions cannot render after a later session starts", async (t) => {
+test("ended sessions cannot render or notify after a later session starts", async (t) => {
 	const handlers = new Map<string, Handler>();
+	let command: CommandHandler | undefined;
 	const intervalCallbacks: Array<() => void> = [];
 	const originalSetInterval = globalThis.setInterval;
 	globalThis.setInterval = ((callback: () => void) => {
@@ -134,13 +135,19 @@ test("ended sessions cannot render after a later session starts", async (t) => {
 		on(name: string, handler: Handler) {
 			handlers.set(name, handler);
 		},
-		registerCommand() {},
+		registerCommand(_name: string, options: { handler: CommandHandler }) {
+			command = options.handler;
+		},
 	} as unknown as ExtensionAPI;
 	let releaseOldAuth: () => void = () => {};
 	const oldAuth = new Promise<void>((resolve) => {
 		releaseOldAuth = resolve;
 	});
-	const makeContext = (statuses: Array<string | undefined>, waitForAuth: boolean) =>
+	const makeContext = (
+		statuses: Array<string | undefined>,
+		notices: Notice[],
+		waitForAuth: boolean,
+	) =>
 		({
 			model: { provider: "github-copilot" },
 			modelRegistry: {
@@ -153,15 +160,22 @@ test("ended sessions cannot render after a later session starts", async (t) => {
 				setStatus(_key: string, value: string | undefined) {
 					statuses.push(value);
 				},
+				notify(message: string, level: string) {
+					notices.push({ message, level });
+				},
 			},
 		}) as unknown as ExtensionContext;
 	const oldStatuses: Array<string | undefined> = [];
 	const newStatuses: Array<string | undefined> = [];
-	const oldContext = makeContext(oldStatuses, true);
-	const newContext = makeContext(newStatuses, false);
+	const oldNotices: Notice[] = [];
+	const newNotices: Notice[] = [];
+	const oldContext = makeContext(oldStatuses, oldNotices, true);
+	const newContext = makeContext(newStatuses, newNotices, false);
 
 	piAuch(pi);
+	assert.ok(command);
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, oldContext);
+	const oldCommand = command("", oldContext);
 	const oldInterval = intervalCallbacks[0];
 	await handlers.get("session_shutdown")?.({ status: 0, headers: {} }, oldContext);
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, newContext);
@@ -171,6 +185,8 @@ test("ended sessions cannot render after a later session starts", async (t) => {
 	const oldRenderCount = oldStatuses.length;
 	oldInterval?.();
 	releaseOldAuth();
+	await oldCommand;
 	await new Promise((resolve) => setImmediate(resolve));
 	assert.equal(oldStatuses.length, oldRenderCount);
+	assert.equal(oldNotices.length, 0);
 });
