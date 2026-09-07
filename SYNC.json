@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T21:53:40+01:00",
+	"confirmedAt": "2026-09-07T21:59:31+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:9dabdc2e6755aa8d3b6f9997c17aab0bfc5dca7e71d730c0e9a5bc9435c196cf",
+			"fingerprint": "sha256:1d850fae0abeb623130ed7bc6dd68b27c9a67afcc6b7ca50625a663b319cac42",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T21:53:40+01:00",
-				"reason": "Recorded the prepared v0.2.1 patch release for the optimized logo documentation change."
+				"at": "2026-09-07T21:59:31+01:00",
+				"reason": "Recorded the completed v0.2.1 patch release after branch and tag CI/CD passed, including npm publication."
 			}
 		},
 		{

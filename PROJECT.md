@@ -56,11 +56,12 @@
 - Kept Copilot passive-only and expanded recognized details without adding a model probe.
 - Implemented concise quota reactions and a 5-minute refresh interval; local release checks pass with 27 tests and 100% line/function coverage.
 - Added the optimized project logo to the README and published package boundary.
-- Prepared the patch release `v0.2.1`; the package includes the self-contained 480px logo asset.
+- Promoted the patch release `v0.2.1`; branch and tag CI/CD passed, including npm publication.
+- The package includes the self-contained optimized 480px logo asset.
 
 ## Immediate next step
 
-- Run branch CI for `v0.2.1`; if it passes, tag and monitor the release pipeline.
+- Monitor `v0.2.1` installation and its reactive two-window Codex footer in normal Pi use.
 
 ## Unresolved
 
