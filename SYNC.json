@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-08T13:33:50+01:00",
+	"confirmedAt": "2026-09-08T14:16:14+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:8ce8e08ee7bfd253cedb8ad4d75617345d8897a54eee276e170ee2ad045156b4",
+			"fingerprint": "sha256:5c7541a6a92da94af51e0b2e950f91844f52c1459ef581780f81e7123139687e",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:22:51+01:00",
-				"reason": "Recorded the verified live Pages URL after the pages job deployed successfully."
+				"at": "2026-09-08T14:16:14+01:00",
+				"reason": "Recorded the GitLab project metadata description alongside the package description."
 			}
 		},
 		{

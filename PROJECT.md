@@ -62,7 +62,7 @@
 - Promoted patch release `v0.2.2`; branch and tag CI/CD passed, including npm publication.
 - The release contains the stronger-reviewed refresh/session fixes and the restored original-resolution logo.
 - Added and verified a GitLab Pages site at `https://pi-auch-63de1a.gitlab.io/` with a dedicated `pages` CI job and the original logo in its published artifact.
-- Set the repository package description to: “Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.”
+- Set the repository package description and GitLab project metadata description to: “Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.”
 
 ## Immediate next step
 
