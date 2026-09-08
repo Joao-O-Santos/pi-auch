@@ -13,6 +13,8 @@ type ReactionColor = "success" | "warning" | "error";
 export type Colorize = (color: ReactionColor, text: string) => string;
 type Reaction = readonly [string, ReactionColor];
 
+const REACTION_THRESHOLDS = [45, 65, 85] as const;
+
 function resetSuffix(resetAt: number | undefined, compact: boolean): string {
 	if (resetAt === undefined) return "";
 	const milliseconds = Math.max(0, resetAt - Date.now());
@@ -43,11 +45,11 @@ function reaction(metric: QuotaMetric): Reaction | undefined {
 			? Math.min(1, Math.max(0, (metric.resetAt - Date.now()) / window)) * 20
 			: 0;
 	const pain = used + wait;
-	return pain < 50
+	return pain < REACTION_THRESHOLDS[0]
 		? ["🙂 nice", "success"]
-		: pain < 70
+		: pain < REACTION_THRESHOLDS[1]
 			? ["😬 ohhh", "warning"]
-			: pain < 90
+			: pain < REACTION_THRESHOLDS[2]
 				? ["😣 auch!", "warning"]
 				: ["😭 AUCH!!", "error"];
 }

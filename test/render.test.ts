@@ -112,11 +112,11 @@ test("weights pain by quota use and time until the matching reset", (t) => {
 			fetchedAt: 1,
 			metrics: [
 				{ label: "5h", usedPercent: 49, resetAt: 1_000_000 + 5 * 3_600_000 },
-				{ label: "weekly", usedPercent: 49, resetAt: 1_000_000 + 7 * 86_400_000 },
+				{ label: "weekly", usedPercent: 50, resetAt: 1_000_000 + 6 * 86_400_000 },
 			],
 		},
 	};
-	assert.equal(formatFooter("openai-codex", state), "Cdx 😬 ohhh 49%/5h - 😬 ohhh 49%/7d");
+	assert.equal(formatFooter("openai-codex", state), "Cdx 😣 auch! 49%/5h - 😣 auch! 50%/6d");
 	assert.equal(
 		formatFooter("openai-codex", {
 			...state,
@@ -124,6 +124,24 @@ test("weights pain by quota use and time until the matching reset", (t) => {
 		}),
 		"Cdx 😭 AUCH!! 95%",
 	);
+});
+
+test("changes usage-only reactions at the early-warning thresholds", () => {
+	const footerAt = (usedPercent: number) =>
+		formatFooter("openai-codex", {
+			status: "ready",
+			stale: false,
+			value: {
+				provider: "openai-codex",
+				fetchedAt: 1,
+				metrics: [{ label: "weekly", usedPercent }],
+			},
+		});
+
+	assert.equal(footerAt(44), "Cdx 🙂 nice 44%");
+	assert.equal(footerAt(45), "Cdx 😬 ohhh 45%");
+	assert.equal(footerAt(65), "Cdx 😣 auch! 65%");
+	assert.equal(footerAt(85), "Cdx 😭 AUCH!! 85%");
 });
 
 test("formats unavailable and stale details, including absent stale error", () => {

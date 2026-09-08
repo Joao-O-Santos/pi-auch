@@ -29,7 +29,7 @@ To try it for one session without installing it:
 pi -e npm:pi-auch
 ```
 
-Usage appears compactly in Pi's footer as provider, emoji, pain reaction, percentage, and reset time: `Cdx 🙂 nice 12%/4h - 😬 ohhh 55%/3d`. Reactions escalate from `nice` to `ohhh`, `auch!`, and `AUCH!!`; Codex weights the 5-hour and weekly reset windows separately. Run `/auch` for full details.
+Usage appears compactly in Pi's footer as provider, emoji, pain reaction, percentage, and reset time: `Cdx 🙂 nice 12%/4h - 😬 ohhh 55%/3d`. Reactions escalate from `nice` to `ohhh`, `auch!`, and `AUCH!!` at adjusted pain scores of 45, 65, and 85. The score is usage percentage plus up to 20 points for the fraction of a known Codex 5-hour or weekly reset window still remaining. Run `/auch` for full details.
 
 ## Authentication
 

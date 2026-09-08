@@ -11,7 +11,7 @@
 - {accepted} Report Codex 5-hour and weekly rolling quotas with time until each reset.
 - {accepted} Report Copilot premium-request and generic request limits passively after normal provider use, including counts, percentages, and reset times when exposed.
 - {accepted} Keep single-metric footer output compact and retain labels for multi-window providers.
-- {accepted} Add compact emoji/color `nice`/`ohhh`/`auch!`/`AUCH!!` reactions, weighting Codex 5-hour and weekly reset time separately.
+- {accepted} Add compact emoji/color `nice`/`ohhh`/`auch!`/`AUCH!!` reactions at adjusted pain scores of 45/65/85, adding up to 20 points for the fraction of a known Codex 5-hour or weekly reset window still remaining.
 - {accepted} Refresh quota on session start, `/auch`, and a 5-minute interval.
 
 ## Audience
@@ -63,6 +63,7 @@
 - The release contains the stronger-reviewed refresh/session fixes and the restored original-resolution logo.
 - Added and verified a GitLab Pages site at `https://pi-auch-63de1a.gitlab.io/` with a dedicated `pages` CI job and the original logo in its published artifact.
 - Set the repository package description and GitLab project metadata description to: “Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.”
+- Lowered adjusted pain thresholds to 45/65/85 so sustained usage early in a reset window produces an earlier warning.
 
 ## Immediate next step
 
