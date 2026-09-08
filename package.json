@@ -1,7 +1,7 @@
 {
 	"name": "pi-auch",
 	"version": "0.2.2",
-	"description": "Another Usage Checker, Horrified: compact quota status for Codex and GitHub Copilot in Pi's footer",
+	"description": "Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.",
 	"type": "module",
 	"license": "MIT",
 	"repository": {

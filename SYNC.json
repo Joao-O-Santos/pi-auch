@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-08T13:13:31+01:00",
+	"confirmedAt": "2026-09-08T13:19:37+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:0ffc0b67389ba9cf0fb52fa8166cb1f62126cf6dc92bafc7734c81f816cb3096",
+			"fingerprint": "sha256:0f4a5d3890cdd1323ceb413b212fd6a6938e98d02a6f73817965a21e4abeada4",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-07T22:32:58+01:00",
-				"reason": "Recorded the completed v0.2.2 patch release after stronger-reviewed code fixes, exact logo restoration, and passing branch/tag CI/CD with npm publication."
+				"at": "2026-09-08T13:19:37+01:00",
+				"reason": "Recorded the GitLab Pages deployment and repository package description update alongside the completed v0.2.2 release."
 			}
 		},
 		{
@@ -27,13 +27,13 @@
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:a4d4198912c97d3e16a74cb57454145572fddfcdc6cb641ba3f40cd9190e7a07",
+			"fingerprint": "sha256:72a1a7b7874dceb15d42039a794d278a9754e35cf8fa23e56998845f864bef70",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:13:31+01:00",
-				"reason": "Synchronized the package boundary after the concurrent description update on main."
+				"at": "2026-09-08T13:19:37+01:00",
+				"reason": "Recorded the requested repository package description for the Pages-backed project presentation."
 			}
 		},
 		{
@@ -56,6 +56,28 @@
 			"acknowledgement": {
 				"at": "2026-08-25T17:55:08.475Z",
 				"reason": "Implemented the user-approved provider scope change: removed OpenCode Go, documented Codex 5-hour plus weekly windows, and expanded Copilot passive limit details without probes. Reviewed package boundary and retained only applicable attribution. Full verification and authenticated smoke passed."
+			}
+		},
+		{
+			"path": ".gitlab-ci.yml",
+			"fingerprint": "sha256:f928a4d8b913c5a0f091eaa926e6068676486e2fcb284de0a046fb7fffce99e7",
+			"status": "current",
+			"role": "deployment",
+			"authoritativeFor": ["ci", "pages-deployment"],
+			"acknowledgement": {
+				"at": "2026-09-08T13:19:37+01:00",
+				"reason": "Added the requested pages job, publishing a static site and the original logo after the check job on the default branch."
+			}
+		},
+		{
+			"path": "site/index.html",
+			"fingerprint": "sha256:79c66176a345f15f543311a0ab8950a026e8ad86b24a028ecda49cf75e3da7c1",
+			"status": "current",
+			"role": "pages-site",
+			"authoritativeFor": ["published-page-content"],
+			"acknowledgement": {
+				"at": "2026-09-08T13:19:37+01:00",
+				"reason": "Added the static landing page content for the GitLab Pages deployment."
 			}
 		}
 	]
