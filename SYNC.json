@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-08T13:22:51+01:00",
+	"confirmedAt": "2026-09-08T13:27:39+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
@@ -60,24 +60,35 @@
 		},
 		{
 			"path": ".gitlab-ci.yml",
-			"fingerprint": "sha256:f928a4d8b913c5a0f091eaa926e6068676486e2fcb284de0a046fb7fffce99e7",
+			"fingerprint": "sha256:de11fd480b75832c38bb623ee675cbd37e3f5ac6257cfeb365f08acd6dce1d6e",
 			"status": "current",
 			"role": "deployment",
 			"authoritativeFor": ["ci", "pages-deployment"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:19:37+01:00",
-				"reason": "Added the requested pages job, publishing a static site and the original logo after the check job on the default branch."
+				"at": "2026-09-08T13:25:00+01:00",
+				"reason": "Updated the pages job to publish the light static stylesheet alongside the landing page and logo."
 			}
 		},
 		{
 			"path": "site/index.html",
-			"fingerprint": "sha256:79c66176a345f15f543311a0ab8950a026e8ad86b24a028ecda49cf75e3da7c1",
+			"fingerprint": "sha256:0f940722a069981f5fc1501f62933d31a8b59da10aaf8215f5751d240d90cee2",
 			"status": "current",
 			"role": "pages-site",
 			"authoritativeFor": ["published-page-content"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:19:37+01:00",
-				"reason": "Added the static landing page content for the GitLab Pages deployment."
+				"at": "2026-09-08T13:25:00+01:00",
+				"reason": "Reworked the landing page to follow make-it-stop's light, simple static-site layout."
+			}
+		},
+		{
+			"path": "site/styles.css",
+			"fingerprint": "sha256:6081bfdea8bef77e3fab72c283bf288403866083d9571d637f8d9f16ace0e871",
+			"status": "current",
+			"role": "pages-style",
+			"authoritativeFor": ["published-page-style"],
+			"acknowledgement": {
+				"at": "2026-09-08T13:25:00+01:00",
+				"reason": "Added a light stylesheet modeled on the reference site's narrow layout, blue headings, sticky menu, and plain code blocks."
 			}
 		}
 	]

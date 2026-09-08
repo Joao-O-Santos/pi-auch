@@ -1,0 +1,162 @@
+:root {
+	--body-bg-color: #fafafa;
+	--text-color: #111111;
+	--headers-text-color: blue;
+	--headers-bg-color: #fafafa;
+	--code-bg-color: #e5e4e2;
+	--menu-bg-color: blue;
+	--menu-text-color: white;
+	--menu-selected-bg-color: #fafafa;
+	--menu-selected-text-color: black;
+	--menu-hover-bg-color: #bebebe;
+	--menu-hover-text-color: black;
+}
+
+body {
+	box-sizing: border-box;
+	max-width: 80%;
+	width: 72ch;
+	margin: 5% auto;
+	background-color: var(--body-bg-color);
+	color: var(--text-color);
+	font-family: system-ui, sans-serif;
+	font-size: 18px;
+	font-weight: normal;
+	line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+	color: var(--headers-text-color);
+	background-color: var(--headers-bg-color);
+	font-weight: bold;
+}
+
+h1 {
+	margin: 50px 0;
+	font-size: 34px;
+	text-align: center;
+}
+
+h2 {
+	font-size: 30px;
+}
+
+h3 {
+	font-size: 26px;
+}
+
+a {
+	color: blue;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+.logo {
+	width: min(240px, 70vw);
+	margin: 0 auto;
+}
+
+.center-image {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+footer {
+	font-size: 14px;
+}
+
+blockquote::before {
+	content: open-quote;
+}
+
+blockquote::after {
+	content: close-quote;
+}
+
+code,
+.code-block {
+	background-color: var(--code-bg-color);
+	font-family: monospace;
+	font-size: 16px;
+	font-weight: normal;
+}
+
+.code-block {
+	padding: 1rem;
+	overflow-x: auto;
+}
+
+.menu {
+	position: sticky;
+	top: 0;
+	width: 120%;
+	margin-left: -10%;
+	background-color: var(--menu-bg-color);
+	text-align: center;
+}
+
+.menu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.menu li {
+	display: inline-block;
+	padding: 0 20px;
+}
+
+.menu li:hover {
+	padding: 0 38px;
+	background-color: var(--menu-hover-bg-color);
+}
+
+.menu a {
+	display: block;
+	margin: 0 -20px;
+	padding: 0 20px;
+	color: var(--menu-text-color);
+	font-size: 20px;
+	font-weight: bold;
+	text-decoration: none;
+}
+
+.menu a:hover {
+	color: var(--menu-hover-text-color);
+}
+
+.menu .selected {
+	background-color: var(--menu-selected-bg-color);
+}
+
+.menu .selected a {
+	color: var(--menu-selected-text-color);
+}
+
+@media (max-width: 600px) {
+	body {
+		max-width: 90%;
+		font-size: 16px;
+	}
+
+	.menu {
+		width: 111%;
+		margin-left: -5.5%;
+	}
+
+	.menu li {
+		padding: 0 8px;
+	}
+
+	.menu a {
+		margin: 0 -8px;
+		padding: 0 8px;
+		font-size: 16px;
+	}
+}

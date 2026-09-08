@@ -40,6 +40,7 @@ pages:
   script:
     - mkdir -p public
     - cp site/index.html public/index.html
+    - cp site/styles.css public/styles.css
     - cp logo.png public/logo.png
   pages: true
   artifacts:

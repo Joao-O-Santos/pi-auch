@@ -2,31 +2,49 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>pi-auch — Another Usage Checker, Horrified</title>
-	<style>
-		:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-		body { margin: 0; background: #17141f; color: #f4efff; }
-		main { box-sizing: border-box; max-width: 52rem; margin: 0 auto; padding: 4rem 1.5rem; }
-		.logo { display: block; width: min(240px, 70vw); height: auto; margin: 0 auto 2rem; }
-		h1 { margin-bottom: .25rem; font-size: clamp(2rem, 8vw, 4rem); }
-		.lede { color: #d2c6e8; font-size: 1.2rem; }
-		.card { margin-top: 2rem; padding: 1.5rem; border: 1px solid #4a3d5e; border-radius: .75rem; background: #211b2c; }
-		code { color: #f9cf72; }
-		a { color: #9fd8ff; }
-	</style>
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<meta name="description" content="Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.">
+	<title>pi-auch</title>
+	<link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-	<main>
-		<img class="logo" src="logo.png" alt="pi-auch logo" width="240" height="240">
+	<nav class="menu" aria-label="Main menu">
+		<ul>
+			<li class="selected"><a href="./">Home</a></li>
+			<li><a href="#install">Install</a></li>
+			<li><a href="#behavior">Behavior</a></li>
+			<li><a href="https://gitlab.com/Joao-O-Santos/pi-auch">Source</a></li>
+		</ul>
+	</nav>
+
+	<header>
+		<img class="logo center-image" src="logo.png" alt="pi-auch logo" width="240" height="240">
 		<h1>pi-auch</h1>
-		<p class="lede">Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.</p>
-		<p>Supports OpenAI Codex and GitHub Copilot without sending model probes.</p>
-		<section class="card">
-			<h2>Install</h2>
-			<pre><code>pi install npm:pi-auch</code></pre>
-			<p><a href="https://gitlab.com/Joao-O-Santos/pi-auch">View the source on GitLab</a> · <a href="https://www.npmjs.com/package/pi-auch">View pi-auch on npm</a></p>
-		</section>
+	</header>
+
+	<main>
+		<p><strong>Another Usage Checker, Horrified.</strong> Compact quota visibility for Pi, with escalating pain as your usage runs out.</p>
+
+		<h2 id="description">Description</h2>
+		<p>pi-auch puts OpenAI Codex and GitHub Copilot quota information in Pi's standard footer without sending model probes.</p>
+		<blockquote>When your usage runs out, the pain escalates.</blockquote>
+
+		<h2 id="install">Install</h2>
+		<pre class="code-block"><code>pi install npm:pi-auch</code></pre>
+		<p>To try it for one session without installing it:</p>
+		<pre class="code-block"><code>pi -e npm:pi-auch</code></pre>
+
+		<h2 id="behavior">Behavior</h2>
+		<ul>
+			<li>Codex reports both 5-hour and weekly rolling windows.</li>
+			<li>Copilot quota is read passively from normal provider responses.</li>
+			<li>Reactions escalate from <code>nice</code> to <code>ohhh</code>, <code>auch!</code>, and <code>AUCH!!</code>.</li>
+		</ul>
+		<p>Read the <a href="https://gitlab.com/Joao-O-Santos/pi-auch/-/blob/main/README.md">full README</a> for authentication and development details.</p>
 	</main>
+
+	<footer>
+		<p>Made for Pi · <a href="https://gitlab.com/Joao-O-Santos/pi-auch">GitLab source</a> · <a href="https://www.npmjs.com/package/pi-auch">npm package</a></p>
+	</footer>
 </body>
 </html>
