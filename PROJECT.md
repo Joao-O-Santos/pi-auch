@@ -61,12 +61,12 @@
 - Hardened refresh/session isolation, removed recovered Copilot rate-limit state, and normalized passive headers once per response after stronger review.
 - Promoted patch release `v0.2.2`; branch and tag CI/CD passed, including npm publication.
 - The release contains the stronger-reviewed refresh/session fixes and the restored original-resolution logo.
-- Added a GitLab Pages site with a dedicated `pages` CI job and copied the original logo into its published artifact.
+- Added and verified a GitLab Pages site at `https://pi-auch-63de1a.gitlab.io/` with a dedicated `pages` CI job and the original logo in its published artifact.
 - Set the repository package description to: “Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.”
 
 ## Immediate next step
 
-- Verify the deployed GitLab Pages site and continue monitoring `v0.2.2` installation and its reactive two-window Codex footer.
+- Monitor the deployed Pages site and `v0.2.2` installation with its reactive two-window Codex footer.
 
 ## Unresolved
 
