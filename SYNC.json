@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-07T22:32:58+01:00",
+	"confirmedAt": "2026-09-08T13:13:31+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
@@ -15,25 +15,25 @@
 		},
 		{
 			"path": "README.md",
-			"fingerprint": "sha256:24d1c7ddfc9e7b7d1e2ea7ab05844d8660a7dec944b74d6dd6fd0747846e94e9",
+			"fingerprint": "sha256:3fd3fdd54b7611e6cce1001320c9b68d127add98aaf4f4936c8b55bf4bc4fd48",
 			"status": "current",
 			"role": "documentation",
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-09-07T21:46:06+01:00",
-				"reason": "Added the project logo to the rendered README and kept the published package boundary aligned."
+				"at": "2026-09-08T13:13:31+01:00",
+				"reason": "Switched the README logo to GitLab's raw PNG URL so the project page resolves image bytes instead of a blob HTML route."
 			}
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:c58dec03751ad7ea443d501d30d69f3a07b23a23665171e5b1386214353e1355",
+			"fingerprint": "sha256:a4d4198912c97d3e16a74cb57454145572fddfcdc6cb641ba3f40cd9190e7a07",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-09-07T22:26:30+01:00",
-				"reason": "Prepared v0.2.2 with the original-resolution logo and stronger-reviewed code fixes."
+				"at": "2026-09-08T13:13:31+01:00",
+				"reason": "Synchronized the package boundary after the concurrent description update on main."
 			}
 		},
 		{

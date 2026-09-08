@@ -1,7 +1,7 @@
 # pi-auch
 
 <p align="center">
-  <img src="logo.png" alt="pi-auch logo" width="240">
+  <img src="https://gitlab.com/Joao-O-Santos/pi-auch/-/raw/main/logo.png" alt="pi-auch logo" width="240">
 </p>
 
 [![pipeline
