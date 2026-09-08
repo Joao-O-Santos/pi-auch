@@ -13,6 +13,8 @@ version](https://img.shields.io/npm/v/pi-auch.svg)](https://www.npmjs.com/packag
 downloads](https://img.shields.io/npm/dt/pi-auch.svg)](https://www.npmjs.com/package/pi-auch)
 [![license](https://img.shields.io/npm/l/pi-auch.svg)](https://gitlab.com/Joao-O-Santos/pi-auch/-/blob/main/LICENSE)
 
+**Another Usage Checker, Horrified.**
+
 Compact quota visibility for Pi's standard footer. It supports OpenAI Codex and GitHub Copilot without sending model probes.
 
 ## Install
