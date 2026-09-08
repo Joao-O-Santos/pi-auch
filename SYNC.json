@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-08T13:27:39+01:00",
+	"confirmedAt": "2026-09-08T13:33:50+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
@@ -71,13 +71,13 @@
 		},
 		{
 			"path": "site/index.html",
-			"fingerprint": "sha256:0f940722a069981f5fc1501f62933d31a8b59da10aaf8215f5751d240d90cee2",
+			"fingerprint": "sha256:f2d8234c90c2265f017fd860a4653fd370a0b3c46a86128be445cf142462ba0e",
 			"status": "current",
 			"role": "pages-site",
 			"authoritativeFor": ["published-page-content"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:25:00+01:00",
-				"reason": "Reworked the landing page to follow make-it-stop's light, simple static-site layout."
+				"at": "2026-09-08T13:33:50+01:00",
+				"reason": "Reduced the navigation to Documentation and Source Code for the small static site."
 			}
 		},
 		{
