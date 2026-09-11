@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-11T11:37:39+01:00",
+	"confirmedAt": "2026-09-11T11:44:09+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
@@ -27,13 +27,13 @@
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:72a1a7b7874dceb15d42039a794d278a9754e35cf8fa23e56998845f864bef70",
+			"fingerprint": "sha256:c36acf3d6ed910d4e780b5b1bb9b2bb5baae3a34203fe8a15985f06bfb08492b",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-09-08T13:19:37+01:00",
-				"reason": "Recorded the requested repository package description for the Pages-backed project presentation."
+				"at": "2026-09-11T11:44:09+01:00",
+				"reason": "Recorded package version 0.2.3 for the tagged release."
 			}
 		},
 		{
