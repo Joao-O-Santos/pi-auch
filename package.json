@@ -1,6 +1,6 @@
 {
 	"name": "pi-auch",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"description": "Another Usage Checker, Horrified. Compact quota visibility for Pi, with escalating pain as your usage runs out.",
 	"type": "module",
 	"license": "MIT",
