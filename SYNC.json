@@ -1,28 +1,28 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-08T14:24:47+01:00",
+	"confirmedAt": "2026-09-11T11:37:39+01:00",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:ceeb8f501706f70954ff0768e60d9537f7e3d7a4d0047a87a890d4a0c0ac5d6d",
+			"fingerprint": "sha256:1752d6ad35d98eeb8e6283ccd45a02fa58a6861f108d0202f1ad8a03e853d166",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-08T14:24:47+01:00",
-				"reason": "Recorded the user-approved earlier warning thresholds for adjusted quota pain."
+				"at": "2026-09-11T11:37:39+01:00",
+				"reason": "Recorded the user-requested default one-minute quota polling interval."
 			}
 		},
 		{
 			"path": "README.md",
-			"fingerprint": "sha256:8537a6da27948d0a9aad9f27b3f3d74fe9eddfeb6b6a56cafcd713210ddaa940",
+			"fingerprint": "sha256:a457808a327b8a371ed46c12a38b51b31475c46798412be2ac6cec6418dd8812",
 			"status": "current",
 			"role": "documentation",
 			"authoritativeFor": ["package-usage", "authentication", "runtime-behavior"],
 			"updateFrom": ["PROJECT.md", "package.json"],
 			"acknowledgement": {
-				"at": "2026-09-08T14:24:47+01:00",
-				"reason": "Documented the 45/65/85 adjusted pain thresholds and reset-time weighting."
+				"at": "2026-09-11T11:37:39+01:00",
+				"reason": "Updated the documented default quota polling interval to one minute."
 			}
 		},
 		{

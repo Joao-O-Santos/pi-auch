@@ -6,7 +6,7 @@ import { type Colorize, formatConfiguredFooter, formatDetail } from "./render.js
 import { PROVIDERS, type ProviderId, type QuotaResult } from "./types.js";
 
 const STATUS_KEY = "pi-auch";
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = 60 * 1000;
 
 const PASSIVE_PARSERS: Partial<
 	Record<ProviderId, (headers: Record<string, string>, status: number) => QuotaResult | undefined>

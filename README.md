@@ -40,7 +40,7 @@ pi-auch never opens Pi's credential files, stores provider credentials, logs cre
 
 ## Behavior
 
-Quota is fetched at session start, every 5 minutes, and on `/auch`. Passive provider data updates after normal model responses. Requests have deadlines and body-size limits. Concurrent refreshes are deduplicated. A transient failure keeps the last successful value marked as stale.
+Quota is fetched at session start, every minute, and on `/auch`. Passive provider data updates after normal model responses. Requests have deadlines and body-size limits. Concurrent refreshes are deduplicated. A transient failure keeps the last successful value marked as stale.
 
 The passive quota-header conventions are adapted from MIT-licensed [`@mtrojnar/pi-usage`](https://github.com/mtrojnar/pi-usage); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 

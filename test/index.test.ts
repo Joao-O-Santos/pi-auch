@@ -77,7 +77,7 @@ test("extension follows the complete session, model, command, and shutdown lifec
 
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
 	await handlers.get("session_start")?.({ status: 0, headers: {} }, context);
-	assert.equal(intervalDelay, 5 * 60 * 1000);
+	assert.equal(intervalDelay, 60 * 1000);
 	intervalCallback?.();
 	await new Promise((resolve) => setImmediate(resolve));
 	assert.match(statuses.at(-1) ?? "", /GH configured/);
