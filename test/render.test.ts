@@ -54,14 +54,14 @@ test("renders Codex 5h and weekly percentages with appropriate reset units", (t)
 			],
 		},
 	};
-	assert.equal(formatFooter("openai-codex", state), "Cdx 🙂 nice 12%/5h - 😬 ohhh 55%/3d");
+	assert.equal(formatFooter("openai-codex", state), "Cdx 🙂 nice 12%/4h33m - 😬 ohhh 55%/2d13h");
 	assert.equal(
 		formatDetail("openai-codex", state),
 		"Codex: 🙂 nice 5h 12%/4.5h · 😬 ohhh weekly 55%/2.5d",
 	);
 	assert.equal(
 		formatFooter("openai-codex", state, (color, text) => `[${color}:${text}]`),
-		"Cdx [success:🙂 nice] 12%/5h - [warning:😬 ohhh] 55%/3d",
+		"Cdx [success:🙂 nice] 12%/4h33m - [warning:😬 ohhh] 55%/2d13h",
 	);
 });
 
@@ -95,7 +95,7 @@ test("formats and prioritizes detailed Copilot metrics and reset units", (t) => 
 		{ label: "completions", usedPercent: 20 },
 		{ label: "unknown", resetAt: 1_000_000 + 30_000 },
 	]);
-	assert.equal(formatFooter("github-copilot", state), "GH 🙂 nice 8/10/3h - 🙂 nice ∞");
+	assert.equal(formatFooter("github-copilot", state), "GH 🙂 nice 8/10/3h0m - 🙂 nice ∞");
 	assert.equal(
 		formatDetail("github-copilot", state),
 		"Copilot (pro): 🙂 nice premium interactions 8/10 left/3.0h · 🙂 nice chat ∞ · other 3 left/3m · 🙂 nice completions 20% · unknown/30s",
@@ -116,13 +116,32 @@ test("weights pain by quota use and time until the matching reset", (t) => {
 			],
 		},
 	};
-	assert.equal(formatFooter("openai-codex", state), "Cdx 😣 auch! 49%/5h - 😣 auch! 50%/6d");
+	assert.equal(formatFooter("openai-codex", state), "Cdx 😣 auch! 49%/5h0m - 😣 auch! 50%/6d0h");
 	assert.equal(
 		formatFooter("openai-codex", {
 			...state,
 			value: { ...state.value, metrics: [{ label: "5h", usedPercent: 95 }] },
 		}),
 		"Cdx 😭 AUCH!! 95%",
+	);
+});
+
+test("reports the local reset time when quota is exhausted", (t) => {
+	t.mock.method(Date, "now", () => 1_000_000);
+	const resetAt = 1_000_000 + 2 * 3_600_000 + 34 * 60_000;
+	const reset = new Date(resetAt);
+	const localTime = `${String(reset.getHours()).padStart(2, "0")}h${String(reset.getMinutes()).padStart(2, "0")}m`;
+	assert.equal(
+		formatFooter("openai-codex", {
+			status: "ready",
+			stale: false,
+			value: {
+				provider: "openai-codex",
+				fetchedAt: 1,
+				metrics: [{ label: "5h", usedPercent: 100, resetAt }],
+			},
+		}),
+		`Cdx 😭 AUCH!! 100%/2h34m try back at ${localTime}`,
 	);
 });
 

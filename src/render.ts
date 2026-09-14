@@ -19,14 +19,31 @@ function resetSuffix(resetAt: number | undefined, compact: boolean): string {
 	if (resetAt === undefined) return "";
 	const milliseconds = Math.max(0, resetAt - Date.now());
 	if (compact) {
-		if (milliseconds >= 86_400_000) return `/${Math.ceil(milliseconds / 86_400_000)}d`;
-		if (milliseconds >= 3_600_000) return `/${Math.ceil(milliseconds / 3_600_000)}h`;
-		return `/${Math.ceil(milliseconds / 60_000)}m`;
+		const minutes = Math.ceil(milliseconds / 60_000);
+		if (minutes >= 24 * 60) {
+			const days = Math.floor(minutes / (24 * 60));
+			const hours = Math.ceil((minutes % (24 * 60)) / 60);
+			return `/${hours === 24 ? days + 1 : days}d${hours === 24 ? 0 : hours}h`;
+		}
+		if (minutes >= 60) return `/${Math.floor(minutes / 60)}h${minutes % 60}m`;
+		return `/${minutes}m`;
 	}
 	if (milliseconds >= 2 * 86_400_000) return `/${(milliseconds / 86_400_000).toFixed(1)}d`;
 	if (milliseconds >= 2 * 3_600_000) return `/${(milliseconds / 3_600_000).toFixed(1)}h`;
 	if (milliseconds >= 2 * 60_000) return `/${Math.ceil(milliseconds / 60_000)}m`;
 	return `/${Math.ceil(milliseconds / 1000)}s`;
+}
+
+function retrySuffix(metric: QuotaMetric): string {
+	const exhausted =
+		metric.remaining !== undefined
+			? metric.remaining <= 0
+			: metric.usedPercent !== undefined && metric.usedPercent >= 100;
+	if (!exhausted || metric.resetAt === undefined || metric.resetAt <= Date.now()) return "";
+	const reset = new Date(metric.resetAt);
+	const hours = String(reset.getHours()).padStart(2, "0");
+	const minutes = String(reset.getMinutes()).padStart(2, "0");
+	return ` try back at ${hours}h${minutes}m`;
 }
 
 function reaction(metric: QuotaMetric): Reaction | undefined {
@@ -83,6 +100,7 @@ function formatMetric(
 	} else
 		value = compact ? `${label === "rate limited" ? "429" : label}${reset}` : `${label}${reset}`;
 	const ouch = reaction(metric);
+	value += retrySuffix(metric);
 	if (!ouch) return value;
 	return `${colorize ? colorize(ouch[1], ouch[0]) : ouch[0]} ${value}`;
 }
