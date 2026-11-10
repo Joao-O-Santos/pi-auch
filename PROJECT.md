@@ -69,7 +69,11 @@
 
 ## Immediate next step
 
-- Monitor the deployed Pages site and `v0.2.2` installation with its reactive two-window Codex footer.
+- Published `v0.3.1` at `a50939f8161b3a0f77ad2514fec3356f6fd8708e`.
+  Main pipeline `3049474141` and release pipeline `3049671492` passed.
+  npm version/latest/gitHead and all 13 published files match the signed
+  release; tarball integrity and provenance metadata were checked.
+- Monitor the deployed Pages site and Pi 1.5.1 installation.
 
 ## Unresolved
 

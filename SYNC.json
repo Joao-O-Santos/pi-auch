@@ -1,16 +1,16 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-11-10T11:15:53Z",
+	"confirmedAt": "2026-11-10T13:05:19Z",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
-			"fingerprint": "sha256:2eeaa0fd5d208856b6ee9fe9bc8e838243fa21508683d6da0649bdde4218acf7",
+			"fingerprint": "sha256:b114d60f8d13994cd2f7edf4285f2370c7e49f11f9cc98dc4e4c4229f50cbf47",
 			"status": "current",
 			"role": "project",
 			"authoritativeFor": ["objective", "scope", "constraints", "completion-criteria"],
 			"acknowledgement": {
-				"at": "2026-09-14T14:47:08+01:00",
-				"reason": "Recorded compact day/hour or hour/minute reset countdowns and local-time retry hints."
+				"at": "2026-11-10T13:05:19Z",
+				"reason": "Recorded signed v0.3.1, passing main/release pipelines, and matching npm version/latest/gitHead, tarball files, integrity, and provenance metadata."
 			}
 		},
 		{
