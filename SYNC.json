@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"confirmedAt": "2026-09-14T14:49:22+01:00",
+	"confirmedAt": "2026-11-10T11:15:53Z",
 	"artifacts": [
 		{
 			"path": "PROJECT.md",
@@ -27,13 +27,13 @@
 		},
 		{
 			"path": "package.json",
-			"fingerprint": "sha256:d61facc6582fc888f3550099a23303c066b379fcc7e61d0cc682762e7cdff0cb",
+			"fingerprint": "sha256:e5776a613a2b130665b27a0314f5bd7b93f3baab11b780b397e34e8e7b25836a",
 			"status": "current",
 			"role": "package-boundary",
 			"authoritativeFor": ["version", "scripts", "Pi-discovery", "published-files"],
 			"acknowledgement": {
-				"at": "2026-09-14T14:49:22+01:00",
-				"reason": "Recorded package version 0.3.0 for the tagged release."
+				"at": "2026-11-10T11:15:53Z",
+				"reason": "Prepared patch 0.3.1 and validated against Pi 1.5.1."
 			}
 		},
 		{
